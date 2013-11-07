@@ -79,33 +79,6 @@ namespace Haberdasher
 
 		#endregion
 
-		#region Cache Access
-
-		protected bool IsInCache(TKey key) {
-			return _entityCache.ContainsKey(key) && _entityCache[key] != null;
-		}
-
-		protected bool IsInCache(TEntity entity) {
-			var key = (TKey)_key.Getter(entity);
-
-			return _entityCache.ContainsKey(key);
-		}
-
-		protected TEntity GetFromCache(TKey key) {
-			return _entityCache.ContainsKey(key) ? _entityCache[key] : null;
-		}
-
-		protected void AddToCache(TEntity entity) {
-			var key = (TKey)_key.Getter(entity);
-
-			if (!_entityCache.ContainsKey(key))
-				_entityCache.Add(key, entity);
-			else
-				_entityCache[key] = entity;
-		}
-
-		#endregion
-
 		#region Dapper Wrappers
 
 		public IEnumerable<TEntity> Query(string sql, object param = null, SqlTransaction transaction = null, bool buffered = true) {
@@ -131,9 +104,6 @@ namespace Haberdasher
 		#region CRUD Methods
 
 		public virtual TEntity Get(TKey key) {
-			if (IsInCache(key))
-				return GetFromCache(key);
-
 			var parameters = new DynamicParameters();
 
 			parameters.Add("id", key);
@@ -144,23 +114,11 @@ namespace Haberdasher
 				entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, "@id"), parameters).FirstOrDefault();
 			}
 
-			if (entity != null)
-				AddToCache(entity);
-
 			return entity;
 		}
 
 		public virtual IEnumerable<TEntity> Get(IEnumerable<TKey> keys) {
 			var results = new List<TEntity>();
-			var dbKeys = new List<TKey>();
-
-			foreach (var key in keys) {
-				if (IsInCache(key))
-					results.Add(GetFromCache(key));
-				else
-					dbKeys.Add(key);
-			}
-
 			var parameters = new DynamicParameters();
 
 			parameters.Add("keys", keys);
@@ -171,12 +129,8 @@ namespace Haberdasher
 				entities = connection.Query<TEntity>(_tailor.SelectMany(_selectFields, _key, "@keys"), parameters).ToList();
 			}
 
-			if (entities.Any()) {
-				foreach (var entity in entities) {
-					AddToCache(entity);
-					results.Add(entity);
-				}
-			}
+			if (entities.Any())
+				results.AddRange(entities);
 
 			return results;
 		}
@@ -200,8 +154,6 @@ namespace Haberdasher
 
 			if (entity == null)
 				return null;
-
-			AddToCache(entity);
 
 			return entity;
 		}
@@ -254,10 +206,10 @@ namespace Haberdasher
 
 			var result = 0;
 
-			if (properties.Count > 0) {
-				using (var connection = _connection) {
-					result = connection.Execute(_tailor.Update(properties, _key, "@" + _key.Property), parameters);
-				}
+			if (properties.Count <= 0) return result;
+
+			using (var connection = _connection) {
+				result = connection.Execute(_tailor.Update(properties, _key, "@" + _key.Property), parameters);
 			}
 
 			return result;
