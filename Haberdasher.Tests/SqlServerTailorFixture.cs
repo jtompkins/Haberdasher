@@ -106,6 +106,27 @@ namespace Haberdasher.Tests
 
 				Assert.Equal(sql, expectedSql);
 			}
+
+			[Fact]
+			public void CreatesWellFormedAll() {
+				var properties = new List<CachedProperty>() {_idProperty, _nameProperty};
+
+				var sql = _tailor.All(properties, _idProperty);
+				var expectedSql = "select Id, Name from [SimpleClasses] order by Id";
+
+				Assert.Equal(sql, expectedSql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedFind() {
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty };
+				var where = "Name like '%test%'";
+
+				var sql = _tailor.Find(properties, where);
+				var expectedSql = "select Id, Name from [SimpleClasses] where " + where;
+
+				Assert.Equal(sql, expectedSql);
+			}
 		}
 
 		public class NonIdentityKeyClassTests

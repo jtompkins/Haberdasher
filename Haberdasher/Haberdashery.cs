@@ -80,9 +80,6 @@ namespace Haberdasher
 
 			if (!CachedTypes.ContainsKey(_entityType))
 				CachedTypes.Add(_entityType, new CachedType(_entityType));
-
-			if (_key == null)
-				throw new MissingPrimaryKeyException("Entity type does not define a primary key.");
 		}
 
 		#endregion

@@ -46,12 +46,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CachedPropertyFixture.cs" />
+    <Compile Include="CachedTypeFixture.cs" />
     <Compile Include="DelegateMethodTextFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SqlServerTailorFixture.cs" />
     <Compile Include="TestClasses\AdHocClass.cs" />
     <Compile Include="TestClasses\AliasedColumnsClass.cs" />
     <Compile Include="TestClasses\IgnoredColumnsClass.cs" />
+    <Compile Include="TestClasses\NoKeyClass.cs" />
     <Compile Include="TestClasses\NonIdentityKeyClass.cs" />
     <Compile Include="TestClasses\NonScopeIdentityKeyClass.cs" />
     <Compile Include="TestClasses\NullableColumnsClass.cs" />
