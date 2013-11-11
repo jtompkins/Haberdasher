@@ -276,7 +276,7 @@ namespace Haberdasher
 		}
 
 		public Dictionary<string, CachedProperty> BuildPropertiesList(IEnumerable<CachedProperty> properties) {
-			var results = new Dictionary<string, CachedProperty>();
+			var props = new Dictionary<string, CachedProperty>();
 
 			foreach (var property in properties) {
 				if (property == null || String.IsNullOrEmpty(property.Name))
@@ -284,24 +284,24 @@ namespace Haberdasher
 
 				var key = "@" + property.Name;
 
-				if (!results.ContainsKey(key))
-					results.Add(key, property);
+				if (!props.ContainsKey(key))
+					props.Add(key, property);
 			}
 
-			return results;
+			return props;
 		}
 
 		public DynamicParameters BuildParametersList(IEnumerable<CachedProperty> properties, TEntity entity) {
-			var results = new DynamicParameters();
+			var parameters = new DynamicParameters();
 
 			foreach (var property in properties) {
 				if (property == null || String.IsNullOrEmpty(property.Name) || property.Getter == null)
 					continue;
 
-				results.Add(property.Name, property.Getter(entity));
+				parameters.Add(property.Name, property.Getter(entity));
 			}
 
-			return results;
+			return parameters;
 		}
 
 		#endregion
