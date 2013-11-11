@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Xml;
 using Dapper;
 using Haberdasher.Contracts;
 using Haberdasher.Tailors;
@@ -125,6 +126,9 @@ namespace Haberdasher
 		}
 
 		public virtual IEnumerable<TEntity> Get(IEnumerable<TKey> keys) {
+			if (keys == null || !keys.Any())
+				throw new ArgumentException("Keys must not be null or an empty enumerable.");
+
 			var results = new List<TEntity>();
 			var parameters = new DynamicParameters();
 
@@ -178,6 +182,9 @@ namespace Haberdasher
 		}
 
 		public virtual TKey Insert(TEntity entity) {
+			if (entity == null)
+				throw new ArgumentException("Entity must not be null.");
+
 			var properties = BuildPropertiesList(_insertFields);
 			var parameters = BuildParametersList(_insertFields, entity);
 
@@ -191,10 +198,16 @@ namespace Haberdasher
 		}
 
 		public virtual IEnumerable<TKey> Insert(IEnumerable<TEntity> entities) {
+			if (entities == null || !entities.Any())
+				throw new ArgumentException("Entities must not be null or an empty enumerable.");
+
 			return entities.Select(Insert).ToList();
 		}
 
 		public virtual int Update(TEntity entity) {
+			if (entity == null)
+				throw new ArgumentException("Entity must not be null.");
+
 			var properties = BuildPropertiesList(_updateFields);
 			var parameters = BuildParametersList(_updateFields, entity);
 
@@ -212,6 +225,9 @@ namespace Haberdasher
 		}
 
 		public virtual int Update(IEnumerable<TEntity> entities) {
+			if (entities == null || !entities.Any())
+				throw new ArgumentException("Entities must not be null or an empty enumerable.");
+
 			return entities.Sum(entity => Update(entity));
 		}
 
@@ -230,6 +246,9 @@ namespace Haberdasher
 		}
 
 		public virtual int Delete(IEnumerable<TKey> keys) {
+			if (keys == null || !keys.Any())
+				throw new ArgumentException("Keys must not be null or an empty enumerable.");
+
 			var parameters = new DynamicParameters();
 
 			parameters.Add(_key.Property, keys);
