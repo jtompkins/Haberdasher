@@ -14,6 +14,9 @@ namespace Haberdasher.Tailors
 
 		private const string SELECT_PARAM_FORMAT = "{0} as {1}";
 
+		private const string ALL_FORMAT = "{0} order by {1}";
+		private const string FIND_FORMAT = "{0} where {1}";
+
 		private const string INSERT_FORMAT = "set nocount on insert into [{0}] ({1}) values ({2}) {3}";
 
 		private const string UPDATE_FORMAT = "update [{0}] set {1} where {2} = {3}";
@@ -61,6 +64,14 @@ namespace Haberdasher.Tailors
 
 		public string SelectMany(IEnumerable<CachedProperty> properties, CachedProperty key, string keysParam) {
 			return String.Format(SELECT_MANY_FORMAT, BuildColumns(properties), _name, key.Name, keysParam);
+		}
+
+		public string All(IEnumerable<CachedProperty> properties, CachedProperty key) {
+			return String.Format("{0} order by {1}", SelectAll(properties), key.Name);
+		}
+
+		public string Find(IEnumerable<CachedProperty> properties, string whereClause) {
+			return String.Format("{0} where {1}", SelectAll(properties), whereClause);
 		}
 
 		public string Insert(IDictionary<string, CachedProperty> properties, CachedProperty key) {

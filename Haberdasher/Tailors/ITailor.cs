@@ -8,6 +8,10 @@ namespace Haberdasher.Tailors
 		string Select(IEnumerable<CachedProperty> properties, CachedProperty key, string keyParam);
 		string SelectMany(IEnumerable<CachedProperty> properties, CachedProperty key, string keysParam);
 
+		string All(IEnumerable<CachedProperty> properties, CachedProperty key);
+
+		string Find(IEnumerable<CachedProperty> properties, string whereClause);
+
 		string Insert(IDictionary<string, CachedProperty> properties, CachedProperty key);
 
 		string Update(IDictionary<string, CachedProperty> properties, CachedProperty key, string keyParam);

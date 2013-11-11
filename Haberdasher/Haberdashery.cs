@@ -75,6 +75,9 @@ namespace Haberdasher
 
 			if (!CachedTypes.ContainsKey(_entityType))
 				CachedTypes.Add(_entityType, new CachedType(_entityType));
+
+			if (_key == null)
+				throw new MissingPrimaryKeyException("Entity type does not define a primary key.");
 		}
 
 		#endregion
@@ -136,7 +139,7 @@ namespace Haberdasher
 		}
 
 		public IEnumerable<TEntity> Find(string whereClause, object param = null) {
-			var sql = String.Format("{0} where {1}", _tailor.SelectAll(_selectFields), whereClause);
+			var sql = _tailor.Find(_selectFields, whereClause);
 
 			IEnumerable<TEntity> entities;
 
@@ -159,7 +162,7 @@ namespace Haberdasher
 		}
 
 		public virtual IEnumerable<TEntity> All() {
-			var query = String.Format("{0} order by {1}", _tailor.SelectAll(_selectFields), _key.Name);
+			var query = _tailor.All(_selectFields, _key);
 
 			IEnumerable<TEntity> result;
 
@@ -171,13 +174,8 @@ namespace Haberdasher
 		}
 
 		public virtual TKey Insert(TEntity entity) {
-			var properties = new Dictionary<string, CachedProperty>();
-			var parameters = new DynamicParameters();
-
-			foreach (var property in _insertFields) {
-				properties.Add("@" + property.Name, property);
-				parameters.Add(property.Name, property.Getter(entity));
-			}
+			var properties = BuildPropertiesList(_insertFields);
+			var parameters = BuildParametersList(_insertFields, entity);
 
 			decimal identity;
 
@@ -193,16 +191,10 @@ namespace Haberdasher
 		}
 
 		public virtual int Update(TEntity entity) {
-			var properties = new Dictionary<string, CachedProperty>();
-			var parameters = new DynamicParameters();
-			var key = (TKey)_key.Getter(entity);
+			var properties = BuildPropertiesList(_updateFields);
+			var parameters = BuildParametersList(_updateFields, entity);
 
-			parameters.Add(_key.Property, key);
-
-			foreach (var property in _updateFields) {
-				properties.Add("@" + property.Property, property);
-				parameters.Add(property.Name, property.Getter(entity));
-			}
+			parameters.Add(_key.Property, (TKey)_key.Getter(entity));
 
 			var result = 0;
 
@@ -245,6 +237,39 @@ namespace Haberdasher
 			}
 
 			return result;
+		}
+
+		#endregion
+
+		#region Utilities
+
+		public Dictionary<string, CachedProperty> BuildPropertiesList(IEnumerable<CachedProperty> properties) {
+			var results = new Dictionary<string, CachedProperty>();
+
+			foreach (var property in properties) {
+				if (property == null || String.IsNullOrEmpty(property.Name))
+					continue;
+
+				var key = "@" + property.Name;
+
+				if (!results.ContainsKey(key))
+					results.Add(key, property);
+			}
+
+			return results;
+		}
+
+		public DynamicParameters BuildParametersList(IEnumerable<CachedProperty> properties, TEntity entity) {
+			var results = new DynamicParameters();
+
+			foreach (var property in properties) {
+				if (property == null || String.IsNullOrEmpty(property.Name) || property.Getter == null)
+					continue;
+
+				results.Add(property.Name, property.Getter(entity));
+			}
+
+			return results;
 		}
 
 		#endregion
