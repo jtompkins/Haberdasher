@@ -185,8 +185,8 @@ namespace Haberdasher
 			if (entity == null)
 				throw new ArgumentException("Entity must not be null.");
 
-			var properties = BuildPropertiesList(_insertFields);
-			var parameters = BuildParametersList(_insertFields, entity);
+			var properties = BuildPropertyList(_insertFields);
+			var parameters = BuildParameterList(_insertFields, entity);
 
 			decimal identity;
 
@@ -208,8 +208,8 @@ namespace Haberdasher
 			if (entity == null)
 				throw new ArgumentException("Entity must not be null.");
 
-			var properties = BuildPropertiesList(_updateFields);
-			var parameters = BuildParametersList(_updateFields, entity);
+			var properties = BuildPropertyList(_updateFields);
+			var parameters = BuildParameterList(_updateFields, entity);
 
 			parameters.Add(_key.Property, (TKey)_key.Getter(entity));
 
@@ -275,8 +275,8 @@ namespace Haberdasher
 			return new SqlConnection(_connectionString);
 		}
 
-		public Dictionary<string, CachedProperty> BuildPropertiesList(IEnumerable<CachedProperty> properties) {
-			var props = new Dictionary<string, CachedProperty>();
+		public Dictionary<string, CachedProperty> BuildPropertyList(IEnumerable<CachedProperty> properties) {
+			var propertyList = new Dictionary<string, CachedProperty>();
 
 			foreach (var property in properties) {
 				if (property == null || String.IsNullOrEmpty(property.Name))
@@ -284,24 +284,24 @@ namespace Haberdasher
 
 				var key = "@" + property.Name;
 
-				if (!props.ContainsKey(key))
-					props.Add(key, property);
+				if (!propertyList.ContainsKey(key))
+					propertyList.Add(key, property);
 			}
 
-			return props;
+			return propertyList;
 		}
 
-		public DynamicParameters BuildParametersList(IEnumerable<CachedProperty> properties, TEntity entity) {
-			var parameters = new DynamicParameters();
+		public DynamicParameters BuildParameterList(IEnumerable<CachedProperty> properties, TEntity entity) {
+			var parameterList = new DynamicParameters();
 
 			foreach (var property in properties) {
 				if (property == null || String.IsNullOrEmpty(property.Name) || property.Getter == null)
 					continue;
 
-				parameters.Add(property.Name, property.Getter(entity));
+				parameterList.Add(property.Name, property.Getter(entity));
 			}
 
-			return parameters;
+			return parameterList;
 		}
 
 		#endregion
