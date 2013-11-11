@@ -23,12 +23,9 @@ namespace Haberdasher
 		private readonly Type _entityType;
 		private readonly ITailor _tailor;
 		private readonly string _connectionString;
+		private readonly IDbConnection _connection;
 
 		protected readonly IDictionary<TKey, TEntity> _entityCache;
-
-		private IDbConnection _connection {
-			get { return new SqlConnection(_connectionString); }
-		}
 
 		protected CachedProperty _key {
 			get { return CachedTypes[_entityType].Key; }
@@ -54,8 +51,7 @@ namespace Haberdasher
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
 
-		protected Haberdashery(string name, string connectionString = null, ITailor tailor = null)
-			: this() {
+		protected Haberdashery(string name, string connectionString = null, ITailor tailor = null) : this() {
 			_tailor = tailor ?? new SqlServerTailor(name);
 
 			if (!String.IsNullOrEmpty(connectionString)) {
@@ -65,8 +61,16 @@ namespace Haberdasher
 				_connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;
 			}
 			else {
-				throw new Exception("A connection string must be specified, or there must be at least one connection string set in your configuration file.");
+				throw new ArgumentException("A connection string must be specified, or there must be at least one connection string set in your configuration file.");
 			}
+		}
+
+		protected Haberdashery(string name, IDbConnection connection, ITailor tailor = null) : this() {
+			if (connection == null)
+				throw new ArgumentException("A valid IDbConnection must be given.");
+
+			_connection = connection;
+			_tailor = tailor ?? new SqlServerTailor(name);
 		}
 
 		private Haberdashery() {
@@ -85,19 +89,19 @@ namespace Haberdasher
 		#region Dapper Wrappers
 
 		public IEnumerable<TEntity> Query(string sql, object param = null, SqlTransaction transaction = null, bool buffered = true) {
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				return connection.Query<TEntity>(sql, param, transaction, buffered);
 			}
 		}
 
 		public IEnumerable<T> Query<T>(string sql, object param = null, SqlTransaction transaction = null, bool buffered = true) {
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				return connection.Query<T>(sql, param, transaction, buffered);
 			}
 		}
 
 		public int Execute(string sql, object param = null, SqlTransaction transaction = null) {
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				return connection.Execute(sql, param, transaction);
 			}
 		}
@@ -113,7 +117,7 @@ namespace Haberdasher
 
 			TEntity entity;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, "@id"), parameters).FirstOrDefault();
 			}
 
@@ -128,7 +132,7 @@ namespace Haberdasher
 
 			IEnumerable<TEntity> entities;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				entities = connection.Query<TEntity>(_tailor.SelectMany(_selectFields, _key, "@keys"), parameters).ToList();
 			}
 
@@ -143,7 +147,7 @@ namespace Haberdasher
 
 			IEnumerable<TEntity> entities;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				entities = connection.Query<TEntity>(sql, param);
 			}
 
@@ -166,7 +170,7 @@ namespace Haberdasher
 
 			IEnumerable<TEntity> result;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				result = connection.Query<TEntity>(query);
 			}
 
@@ -179,7 +183,7 @@ namespace Haberdasher
 
 			decimal identity;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				identity = connection.Query<decimal>(_tailor.Insert(properties, _key), parameters).Single();
 			}
 
@@ -200,7 +204,7 @@ namespace Haberdasher
 
 			if (properties.Count <= 0) return result;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				result = connection.Execute(_tailor.Update(properties, _key, "@" + _key.Property), parameters);
 			}
 
@@ -218,7 +222,7 @@ namespace Haberdasher
 
 			int result;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				result = connection.Execute(_tailor.Delete(_key, "@" + _key.Property), parameters);
 			}
 
@@ -232,7 +236,7 @@ namespace Haberdasher
 
 			int result;
 
-			using (var connection = _connection) {
+			using (var connection = GetConnection()) {
 				result = connection.Execute(_tailor.DeleteMany(_key, "@" + _key.Property), parameters);
 			}
 
@@ -242,6 +246,15 @@ namespace Haberdasher
 		#endregion
 
 		#region Utilities
+		private IDbConnection GetConnection() {
+			if (_connection != null)
+				return _connection;
+
+			if (String.IsNullOrEmpty(_connectionString))
+				throw new ArgumentException("No connection string defined.");
+
+			return new SqlConnection(_connectionString);
+		}
 
 		public Dictionary<string, CachedProperty> BuildPropertiesList(IEnumerable<CachedProperty> properties) {
 			var results = new Dictionary<string, CachedProperty>();
