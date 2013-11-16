@@ -5,6 +5,9 @@ namespace Haberdasher.Tests.TestClasses
 {
 	public class IgnoredColumnsClass
 	{
+		[Key]
+		public int Key { get; set; }
+
 		[Ignore(IgnoreTypeEnum.Select)]
 		public string IgnoredForSelect { get; set; }
 

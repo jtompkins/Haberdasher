@@ -20,92 +20,92 @@ namespace Haberdasher.Tests
 
 			[Fact]
 			public void IdIsKey() {
-				Assert.Equal(_idProperty.IsKey, true);
+				Assert.Equal(true, _idProperty.IsKey);
 			}
 
 			[Fact]
 			public void IdIsIdentity() {
-				Assert.Equal(_idProperty.IsIdentity, true);
+				Assert.Equal(true, _idProperty.IsIdentity);
 			}
 
 			[Fact]
 			public void IdUsesScopeIdentity() {
-				Assert.Equal(_idProperty.UseScopeIdentity, true);
+				Assert.Equal(true, _idProperty.UseScopeIdentity);
 			}
 
 			[Fact]
 			public void IdIsNotAliased() {
-				Assert.Equal(_idProperty.IsAliased, false);
+				Assert.Equal(false, _idProperty.IsAliased);
 			}
 
 			[Fact]
 			public void IdIsNumeric() {
-				Assert.Equal(_idProperty.IsNumeric, true);
+				Assert.Equal(true, _idProperty.IsNumeric);
 			}
 
 			[Fact]
 			public void IdIsNotNullable() {
-				Assert.Equal(_idProperty.IsNullable, false);
+				Assert.Equal(false, _idProperty.IsNullable);
 			}
 
 			[Fact]
 			public void IdIsSelectable() {
-				Assert.Equal(_idProperty.IsSelectable, true);
+				Assert.Equal(true, _idProperty.IsSelectable);
 			}
 
 			[Fact]
 			public void IdIsNotInsertable() {
-				Assert.Equal(_idProperty.IsInsertable, false);
+				Assert.Equal(false, _idProperty.IsInsertable);
 			}
 
 			[Fact]
 			public void IdIsNotUpdatable() {
-				Assert.Equal(_idProperty.IsUpdatable, false);
+				Assert.Equal(false, _idProperty.IsUpdatable);
 			}
 
 			[Fact]
 			public void NameIsNotAKey() {
-				Assert.Equal(_nameProperty.IsKey, false);
+				Assert.Equal(false, _nameProperty.IsKey);
 			}
 
 			[Fact]
 			public void NameIsNotIdentity() {
-				Assert.Equal(_nameProperty.IsIdentity, false);
+				Assert.Equal(false, _nameProperty.IsIdentity);
 			}
 
 			[Fact]
 			public void NameDoesNotUseScopeIdentity() {
-				Assert.Equal(_nameProperty.UseScopeIdentity, false);
+				Assert.Equal(false, _nameProperty.UseScopeIdentity);
 			}
 
 			[Fact]
 			public void NameIsNotNumeric() {
-				Assert.Equal(_nameProperty.IsNumeric, false);
+				Assert.Equal(false, _nameProperty.IsNumeric);
 			}
 
 			[Fact]
 			public void NameIsNotNullable() {
-				Assert.Equal(_nameProperty.IsNullable, false);
+				Assert.Equal(false, _nameProperty.IsNullable);
 			}
 
 			[Fact]
 			public void NameIsSelectable() {
-				Assert.Equal(_nameProperty.IsSelectable, true);
+				Assert.Equal(true, _nameProperty.IsSelectable);
 			}
 
 			[Fact]
 			public void NameIsInsertable() {
-				Assert.Equal(_nameProperty.IsInsertable, true);
+				Assert.Equal(true, _nameProperty.IsInsertable);
 			}
 			
 			[Fact]
 			public void NameIsUpdatable() {
-				Assert.Equal(_nameProperty.IsUpdatable, true);
+				Assert.Equal(true, _nameProperty.IsUpdatable);
 			}
 
 			[Fact]
 			public void NameDefaultValueIsEmptyString() {
-				Assert.Equal(_nameProperty.DefaultValue, string.Empty);
+				Assert.Equal(string.Empty, _nameProperty.DefaultValue);
 			}
 		}
 
@@ -121,17 +121,17 @@ namespace Haberdasher.Tests
 
 			[Fact]
 			public void IdIsKey() {
-				Assert.Equal(_idProperty.IsKey, true);
+				Assert.Equal(true, _idProperty.IsKey);
 			}
 
 			[Fact]
 			public void IdIsNotIdentity() {
-				Assert.Equal(_idProperty.IsIdentity, false);
+				Assert.Equal(false, _idProperty.IsIdentity);
 			}
 
 			[Fact]
 			public void IdIsInsertable() {
-				Assert.Equal(_idProperty.IsInsertable, true);
+				Assert.Equal(true, _idProperty.IsInsertable);
 			}
 		}
 
@@ -147,17 +147,17 @@ namespace Haberdasher.Tests
 
 			[Fact]
 			public void IdIsKey() {
-				Assert.Equal(_idProperty.IsKey, true);
+				Assert.Equal(true, _idProperty.IsKey);
 			}
 
 			[Fact]
 			public void IdIsIdentity() {
-				Assert.Equal(_idProperty.IsIdentity, true);
+				Assert.Equal(true, _idProperty.IsIdentity);
 			}
 
 			[Fact]
 			public void IdDoesNotUseScopeIdentity() {
-				Assert.Equal(_idProperty.UseScopeIdentity, false);
+				Assert.Equal(false, _idProperty.UseScopeIdentity);
 			}
 		}
 
@@ -175,17 +175,17 @@ namespace Haberdasher.Tests
 
 			[Fact]
 			public void NameIsAliased() {
-				Assert.Equal(_nameProperty.IsAliased, true);
+				Assert.Equal(true, _nameProperty.IsAliased);
 			}
 
 			[Fact]
 			public void NameIsAliasedToProperValue() {
-				Assert.Equal(_nameProperty.Alias, "ADifferentName");
+				Assert.Equal("ADifferentName", _nameProperty.Alias);
 			}
 
 			[Fact]
 			public void NameAliasedToNullIsNotAliased() {
-				Assert.Equal(_descriptionProperty.IsAliased, false);
+				Assert.Equal(false, _descriptionProperty.IsAliased);
 			}
 		}
 
@@ -201,21 +201,21 @@ namespace Haberdasher.Tests
 			public void NameIsNullable() {
 				var nameProperty = new CachedProperty(_type.GetProperty("Name"));
 
-				Assert.Equal(nameProperty.IsNullable, true);
+				Assert.Equal(true, nameProperty.IsNullable);
 			}
 
 			[Fact]
 			public void ThrowsExceptionForNullableKey() {
 				var ex = Assert.Throws<Exception>(() => new CachedProperty(_type.GetProperty("Id")));
 
-				Assert.Equal(ex.Message, "Key properties may not be marked with the Nullable attribute: Id");
+				Assert.Equal("Key properties may not be marked with the Nullable attribute: Id", ex.Message);
 			}
 
 			[Fact]
 			public void ThrowsExceptionForNullableOnNonNullableProperty() {
 				var ex = Assert.Throws<Exception>(() => new CachedProperty(_type.GetProperty("NonNullableProperty")));
 
-				Assert.Equal(ex.Message, "Non-Nullable properties may not be marked with the Nullable attribute: NonNullableProperty");
+				Assert.Equal("Non-Nullable properties may not be marked with the Nullable attribute: NonNullableProperty", ex.Message);
 			}
 		}
 
@@ -239,37 +239,37 @@ namespace Haberdasher.Tests
 
 			[Fact]
 			public void SelectPropertyIsProperlyIgnored() {
-				Assert.Equal(_selectProperty.IsSelectable, false);
-				Assert.Equal(_selectProperty.IsInsertable, true);
-				Assert.Equal(_selectProperty.IsUpdatable, true);
+				Assert.Equal(false, _selectProperty.IsSelectable);
+				Assert.Equal(true, _selectProperty.IsInsertable);
+				Assert.Equal(true, _selectProperty.IsUpdatable);
 			}
 
 			[Fact]
 			public void InsertPropertyIsProperlyIgnored() {
-				Assert.Equal(_insertProperty.IsSelectable, true);
-				Assert.Equal(_insertProperty.IsInsertable, false);
-				Assert.Equal(_insertProperty.IsUpdatable, true);
+				Assert.Equal(true, _insertProperty.IsSelectable);
+				Assert.Equal(false, _insertProperty.IsInsertable);
+				Assert.Equal(true, _insertProperty.IsUpdatable);
 			}
 
 			[Fact]
 			public void UpdatePropertyIsProperlyIgnored() {
-				Assert.Equal(_updateProperty.IsSelectable, true);
-				Assert.Equal(_updateProperty.IsInsertable, true);
-				Assert.Equal(_updateProperty.IsUpdatable, false);
+				Assert.Equal(true, _updateProperty.IsSelectable);
+				Assert.Equal(true, _updateProperty.IsInsertable);
+				Assert.Equal(false, _updateProperty.IsUpdatable);
 			}
 
 			[Fact]
 			public void WritePropertyIsProperlyIgnored() {
-				Assert.Equal(_writeProperty.IsSelectable, true);
-				Assert.Equal(_writeProperty.IsInsertable, false);
-				Assert.Equal(_writeProperty.IsUpdatable, false);
+				Assert.Equal(true, _writeProperty.IsSelectable);
+				Assert.Equal(false, _writeProperty.IsInsertable);
+				Assert.Equal(false, _writeProperty.IsUpdatable);
 			}
 
 			[Fact]
 			public void AllPropertyIsProperlyIgnored() {
-				Assert.Equal(_allProperty.IsSelectable, false);
-				Assert.Equal(_allProperty.IsInsertable, false);
-				Assert.Equal(_allProperty.IsUpdatable, false);
+				Assert.Equal(false, _allProperty.IsSelectable);
+				Assert.Equal(false, _allProperty.IsInsertable);
+				Assert.Equal(false, _allProperty.IsUpdatable);
 			}
 		}
 	}

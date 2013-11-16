@@ -23,5 +23,36 @@ namespace Haberdasher.Tests
 				Assert.DoesNotThrow(() => new CachedType(typeof(SimpleClass)));
 			}
 		}
+
+		public class PropertyScanningTests
+		{
+			[Fact]
+			public void FindsPrimaryKey() {
+				var type = new CachedType(typeof (SimpleClass));
+
+				Assert.NotNull(type.Key);
+			}
+
+			[Fact]
+			public void FindsSelectProperties() {
+				var type = new CachedType(typeof (IgnoredColumnsClass));
+
+				Assert.Equal(type.SelectFields.Count(), 4);
+			}
+
+			[Fact]
+			public void FindsUpdateProperties() {
+				var type = new CachedType(typeof(IgnoredColumnsClass));
+
+				Assert.Equal(type.UpdateFields.Count(), 2);
+			}
+
+			[Fact]
+			public void FindsInsertProperties() {
+				var type = new CachedType(typeof(IgnoredColumnsClass));
+
+				Assert.Equal(type.InsertFields.Count(), 2);
+			}
+		}
 	}
 }

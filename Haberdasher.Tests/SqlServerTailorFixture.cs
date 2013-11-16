@@ -28,7 +28,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.SelectAll(new List<CachedProperty>() { _idProperty, _nameProperty });
 				var expectedSql = "select Id, Name from [SimpleClasses]";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -36,7 +36,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Select(new List<CachedProperty>() { _idProperty, _nameProperty }, _idProperty, "@id");
 				var expectedSql = "select Id, Name from [SimpleClasses] where Id = @id";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -44,7 +44,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.SelectMany(new List<CachedProperty>() { _idProperty, _nameProperty }, _idProperty, "@ids");
 				var expectedSql = "select Id, Name from [SimpleClasses] where Id in @ids";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -56,7 +56,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Insert(properties, _idProperty);
 				var expectedSql = "set nocount on insert into [SimpleClasses] (Name) values (@name) select SCOPE_IDENTITY()";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -68,7 +68,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Update(properties, _idProperty, "@id");
 				var expectedSql = "update [SimpleClasses] set Name = @name where Id = @id";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -80,7 +80,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.UpdateMany(properties, _idProperty, "@ids");
 				var expectedSql = "update [SimpleClasses] set Name = @name where Id in @ids";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -88,7 +88,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.DeleteAll();
 				var expectedSql = "truncate table [SimpleClasses]";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -96,7 +96,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Delete(_idProperty, "@id");
 				var expectedSql = "delete from [SimpleClasses] where Id = @id";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -104,7 +104,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.DeleteMany(_idProperty, "@ids");
 				var expectedSql = "delete from [SimpleClasses] where Id in @ids";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -114,7 +114,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.All(properties, _idProperty);
 				var expectedSql = "select Id, Name from [SimpleClasses] order by Id";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -125,7 +125,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Find(properties, where);
 				var expectedSql = "select Id, Name from [SimpleClasses] where " + where;
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 		}
 
@@ -152,7 +152,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Insert(properties, _idProperty);
 				var expectedSql = "set nocount on insert into [NonIdentityKeyClasses] (Id) values (@id)";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 		}
 
@@ -177,7 +177,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Insert(properties, _idProperty);
 				var expectedSql = "set nocount on insert into [NonScopeIdentityKeyClasses] (Id) values (@id) select @@IDENTITY";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 		}
 
@@ -204,7 +204,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.SelectAll(new List<CachedProperty>() { _idProperty, _nameProperty, _descriptionProperty });
 				var expectedSql = "select Id, ADifferentName as Name, Description from [AliasedColumnsClasses]";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -212,7 +212,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Select(new List<CachedProperty>() { _idProperty, _nameProperty, _descriptionProperty }, _idProperty, "@id");
 				var expectedSql = "select Id, ADifferentName as Name, Description from [AliasedColumnsClasses] where Id = @id";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -220,7 +220,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.SelectMany(new List<CachedProperty>() { _idProperty, _nameProperty, _descriptionProperty }, _idProperty, "@ids");
 				var expectedSql = "select Id, ADifferentName as Name, Description from [AliasedColumnsClasses] where Id in @ids";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -233,7 +233,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Insert(properties, _idProperty);
 				var expectedSql = "set nocount on insert into [AliasedColumnsClasses] (ADifferentName, Description) values (@name, @description) select SCOPE_IDENTITY()";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -246,7 +246,7 @@ namespace Haberdasher.Tests
 				var sql = _tailor.Update(properties, _idProperty, "@id");
 				var expectedSql = "update [AliasedColumnsClasses] set ADifferentName = @name, Description = @description where Id = @id";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
 			}
 
 			[Fact]
@@ -259,7 +259,28 @@ namespace Haberdasher.Tests
 				var sql = _tailor.UpdateMany(properties, _idProperty, "@ids");
 				var expectedSql = "update [AliasedColumnsClasses] set ADifferentName = @name, Description = @description where Id in @ids";
 
-				Assert.Equal(sql, expectedSql);
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedAll() {
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty, _descriptionProperty };
+
+				var sql = _tailor.All(properties, _idProperty);
+				var expectedSql = "select Id, ADifferentName as Name, Description from [AliasedColumnsClasses] order by Id";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedFind() {
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty, _descriptionProperty };
+				var where = "ADifferentName like '%test%'";
+
+				var sql = _tailor.Find(properties, where);
+				var expectedSql = "select Id, ADifferentName as Name, Description from [AliasedColumnsClasses] where " + where;
+
+				Assert.Equal(expectedSql, sql);
 			}
 		}
 	}
