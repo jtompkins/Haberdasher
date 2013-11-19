@@ -282,6 +282,27 @@ namespace Haberdasher.Tests
 
 				Assert.Equal(expectedSql, sql);
 			}
+
+            [Fact]
+            public void FormatSqlParamNameAddsIdentifier()
+            {
+                string paramName = _tailor.FormatSqlParamName("id");
+                Assert.Equal("@id", paramName);
+            }
+
+            [Fact]
+            public void FormatSqlParamNameRemovesAndAddsIdentifier()
+            {
+                string paramName = _tailor.FormatSqlParamName(":id");
+                Assert.Equal("@id", paramName);
+
+                paramName = _tailor.FormatSqlParamName("@id");
+                Assert.Equal("@id", paramName);
+
+                paramName = _tailor.FormatSqlParamName("?id");
+                Assert.Equal("@id", paramName);
+
+            }
 		}
 	}
 }
