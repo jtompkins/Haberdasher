@@ -1,38 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Haberdasher.Tailors
 {
-	public class SqlServerTailor : ITailor
+	public class OracleTailor : ITailor
 	{
 		#region Constants
-
-		private const string SELECT_ALL_FORMAT = "select {0} from [{1}]";
-		private const string SELECT_FORMAT = "select {0} from [{1}] where {2} = {3}";
-		private const string SELECT_MANY_FORMAT = "select {0} from [{1}] where {2} in {3}";
+        // Oracle uses double quotes for literal table names 
+		private const string SELECT_ALL_FORMAT = @"select {0} from ""{1}""";   
+		private const string SELECT_FORMAT = @"select {0} from ""{1}"" where {2} = {3}";
+		private const string SELECT_MANY_FORMAT = @"select {0} from ""{1}"" where {2} in {3}";
 
 		private const string SELECT_PARAM_FORMAT = "{0} as {1}";
 
 		private const string ALL_FORMAT = "{0} order by {1}";
 		private const string FIND_FORMAT = "{0} where {1}";
 
-		private const string INSERT_FORMAT = "set nocount on insert into [{0}] ({1}) values ({2}) {3}";
+		private const string INSERT_FORMAT = @"set nocount on insert into ""{0}"" ({1}) values ({2}) {3}";
 
-		private const string UPDATE_FORMAT = "update [{0}] set {1} where {2} = {3}";
-		private const string UPDATE_MANY_FORMAT = "update [{0}] set {1} where {2} in {3}";
+		private const string UPDATE_FORMAT = @"update ""{0}"" set {1} where {2} = {3}";
+		private const string UPDATE_MANY_FORMAT = @"update ""{0}"" set {1} where {2} in {3}";
 		
 		private const string UPDATE_PARAM_FORMAT = "{0} = {1}";
 
-		private const string DELETE_ALL_FORMAT = "truncate table [{0}]";
-		private const string DELETE_FORMAT = "delete from [{0}] where {1} = {2}";
-		private const string DELETE_MANY_FORMAT = "delete from [{0}] where {1} in {2}";
+		private const string DELETE_ALL_FORMAT = @"truncate table ""{0}""";
+		private const string DELETE_FORMAT = @"delete from ""{0}"" where {1} = {2}";
+		private const string DELETE_MANY_FORMAT = @"delete from ""{0}"" where {1} in {2}";
+
+
+        public const string STR_SqlParamIndicator = ":";
 
 		#endregion
 
 		private readonly string _name;
 
-		public SqlServerTailor(string name) {
+        public OracleTailor(string name)
+        {
 			_name = name;
 		}
 
@@ -59,7 +64,9 @@ namespace Haberdasher.Tailors
 		}
 
 		public string Select(IEnumerable<CachedProperty> properties, CachedProperty key, string keyParam) {
-			return String.Format(SELECT_FORMAT, BuildColumns(properties), _name, key.Name, keyParam);
+            string sql = String.Format(SELECT_FORMAT, BuildColumns(properties), _name, key.Name, keyParam);
+            Debug.Write(String.Format("sql for select = {0}", sql));
+			return sql;
 		}
 
 		public string SelectMany(IEnumerable<CachedProperty> properties, CachedProperty key, string keysParam) {
@@ -116,7 +123,8 @@ namespace Haberdasher.Tailors
 		}
 
         /// <summary>
-        /// Formats the name of the SQL parameter such as including the @ before the param name.
+        /// Formats the name of the SQL parameter such as including the : before the param name.
+        /// Passing in "Id" returns ":Id"
         /// </summary>
         /// <param name="paramName">Name of the parameter.</param>
         /// <returns>System.String.</returns>
@@ -128,7 +136,7 @@ namespace Haberdasher.Tailors
             }
 
             string cleanName = Clean(paramName);
-            string name = String.Format("@{0}", cleanName);
+            string name = String.Format("{0}{1}",STR_SqlParamIndicator, cleanName);
             return name;
         }
 
@@ -151,5 +159,5 @@ namespace Haberdasher.Tailors
             }
             return name;
         }
-    }
+	}
 }

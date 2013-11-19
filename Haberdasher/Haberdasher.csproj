@@ -60,6 +60,7 @@
     <Compile Include="Support\GetterBuilder.cs" />
     <Compile Include="Support\SetterBuilder.cs" />
     <Compile Include="Tailors\ITailor.cs" />
+    <Compile Include="Tailors\OracleTailor.cs" />
     <Compile Include="Tailors\SqlServerTailor.cs" />
   </ItemGroup>
   <ItemGroup>

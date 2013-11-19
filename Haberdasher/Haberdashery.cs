@@ -116,7 +116,8 @@ namespace Haberdasher
 			TEntity entity;
 
 			using (var connection = GetConnection()) {
-				entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, "@id"), parameters).FirstOrDefault();
+                string keyParamName = _tailor.FormatSqlParamName("id");
+                entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, keyParamName), parameters).FirstOrDefault();
 			}
 
 			return entity;
@@ -134,7 +135,8 @@ namespace Haberdasher
 			IEnumerable<TEntity> entities;
 
 			using (var connection = GetConnection()) {
-				entities = connection.Query<TEntity>(_tailor.SelectMany(_selectFields, _key, "@keys"), parameters).ToList();
+                string keyParamName = _tailor.FormatSqlParamName("keys");
+				entities = connection.Query<TEntity>(_tailor.SelectMany(_selectFields, _key, keyParamName), parameters).ToList();
 			}
 
 			if (entities.Any())
@@ -215,7 +217,8 @@ namespace Haberdasher
 			if (properties.Count <= 0) return result;
 
 			using (var connection = GetConnection()) {
-				result = connection.Execute(_tailor.Update(properties, _key, "@" + _key.Property), parameters);
+                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+				result = connection.Execute(_tailor.Update(properties, _key, keyParamName), parameters);
 			}
 
 			return result;
@@ -236,7 +239,8 @@ namespace Haberdasher
 			int result;
 
 			using (var connection = GetConnection()) {
-				result = connection.Execute(_tailor.Delete(_key, "@" + _key.Property), parameters);
+                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+                result = connection.Execute(_tailor.Delete(_key, keyParamName), parameters);
 			}
 
 			return result;
@@ -253,7 +257,8 @@ namespace Haberdasher
 			int result;
 
 			using (var connection = GetConnection()) {
-				result = connection.Execute(_tailor.DeleteMany(_key, "@" + _key.Property), parameters);
+                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+				result = connection.Execute(_tailor.DeleteMany(_key, keyParamName), parameters);
 			}
 
 			return result;
@@ -279,7 +284,7 @@ namespace Haberdasher
 				if (property == null || String.IsNullOrEmpty(property.Name))
 					continue;
 
-				var key = "@" + property.Name;
+                var key = _tailor.FormatSqlParamName(property.Name);
 
 				if (!propertyList.ContainsKey(key))
 					propertyList.Add(key, property);

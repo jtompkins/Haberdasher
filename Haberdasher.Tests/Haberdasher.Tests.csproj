@@ -54,6 +54,7 @@
     <Compile Include="DelegateMethodTextFixture.cs" />
     <Compile Include="HaberdasheryFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OracleTailorFixture.cs" />
     <Compile Include="SqlServerTailorFixture.cs" />
     <Compile Include="TestClasses\AdHocClass.cs" />
     <Compile Include="TestClasses\AliasedColumnsClass.cs" />
