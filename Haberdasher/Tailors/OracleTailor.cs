@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Haberdasher.Support;
 
 namespace Haberdasher.Tailors
 {
@@ -18,7 +19,7 @@ namespace Haberdasher.Tailors
 		private const string ALL_FORMAT = "{0} order by {1}";
 		private const string FIND_FORMAT = "{0} where {1}";
 
-		private const string INSERT_FORMAT = @"set nocount on insert into ""{0}"" ({1}) values ({2}) {3}";
+		private const string INSERT_FORMAT = @"insert into ""{0}"" ({1}) values ({2}) {3}";
 
 		private const string UPDATE_FORMAT = @"update ""{0}"" set {1} where {2} = {3}";
 		private const string UPDATE_MANY_FORMAT = @"update ""{0}"" set {1} where {2} in {3}";
@@ -33,7 +34,7 @@ namespace Haberdasher.Tailors
         public const string STR_SqlParamIndicator = ":";
 
 		#endregion
-
+        // name of the table
 		private readonly string _name;
 
         public OracleTailor(string name)
@@ -65,62 +66,107 @@ namespace Haberdasher.Tailors
 
 		public string Select(IEnumerable<CachedProperty> properties, CachedProperty key, string keyParam) {
             string sql = String.Format(SELECT_FORMAT, BuildColumns(properties), _name, key.Name, keyParam);
-            Debug.Write(String.Format("sql for select = {0}", sql));
-			return sql;
+            Debug.WriteLine(String.Format("Select :: sql = {0}", sql));
+            return sql;
 		}
 
 		public string SelectMany(IEnumerable<CachedProperty> properties, CachedProperty key, string keysParam) {
-			return String.Format(SELECT_MANY_FORMAT, BuildColumns(properties), _name, key.Name, keysParam);
+            string sql = String.Format(SELECT_MANY_FORMAT, BuildColumns(properties), _name, key.Name, keysParam);
+            Debug.WriteLine(String.Format("SelectMany :: sql = {0}", sql));
+            return sql;
 		}
 
-		public string All(IEnumerable<CachedProperty> properties, CachedProperty key) {
-			return String.Format("{0} order by {1}", SelectAll(properties), key.Name);
-		}
+        public string All(IEnumerable<CachedProperty> properties, CachedProperty key)
+        {
+            string sql = String.Format("{0} order by {1}", SelectAll(properties), key.Name);
+            Debug.WriteLine(String.Format("All :: sql = {0}", sql));
 
-		public string Find(IEnumerable<CachedProperty> properties, string whereClause) {
-			return String.Format("{0} where {1}", SelectAll(properties), whereClause);
-		}
+            return sql;
+        }
 
-		public string Insert(IDictionary<string, CachedProperty> properties, CachedProperty key) {
-			var fields = new List<string>();
-			var valueParams = new List<string>();
+        public string Find(IEnumerable<CachedProperty> properties, string whereClause)
+        {
+            string sql = String.Format("{0} where {1}", SelectAll(properties), whereClause);
+            Debug.WriteLine(String.Format("Find :: sql = {0}", sql));
 
-			foreach (var kvp in properties) {
-				fields.Add(kvp.Value.Name);
-				valueParams.Add(kvp.Key);
-			}
+            return sql;
+        }
 
-			var insertOptions = "";
+        public string Insert(IDictionary<string, CachedProperty> properties, CachedProperty key)
+        {
+            var fields = new List<string>();
+            var valueParams = new List<string>();
 
-			if (key.IsIdentity)
-				insertOptions = key.UseScopeIdentity ? "select SCOPE_IDENTITY()" : "select @@IDENTITY";
+            foreach (var kvp in properties)
+            {
+                fields.Add(kvp.Value.Name);
+                valueParams.Add(kvp.Key);
+            }
 
-			return String.Format(INSERT_FORMAT, _name, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
-		}
+            var insertOptions = "";
 
-		public string Update(IDictionary<string, CachedProperty> properties, CachedProperty key, string keyParam) {
-			var clauses = properties.Select(kvp => String.Format(UPDATE_PARAM_FORMAT, kvp.Value.Name, kvp.Key));
+            string sql = String.Format(INSERT_FORMAT, _name, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
 
-			return String.Format(UPDATE_FORMAT, _name, String.Join(", ", clauses), key.Name, keyParam);
-		}
+            // if key is set by a trigger, retrieve the value using plsql block 
+            if (key.IsIdentity)
+            {
+                string plsql = String.Format(@"declare
+                                   newId number;
+                                 begin
+                                   {0} returning {1} into newId;
+                                 end;", sql, key.Name);
 
-		public string UpdateMany(IDictionary<string, CachedProperty> properties, CachedProperty key, string keysParam) {
-			var clauses = properties.Select(kvp => String.Format(UPDATE_PARAM_FORMAT, kvp.Value.Name, kvp.Key));
+                sql = plsql;
+            }
 
-			return String.Format(UPDATE_MANY_FORMAT, _name, String.Join(", ", clauses), key.Name, keysParam);
-		}
+            Debug.WriteLine(String.Format("Insert :: sql = {0}", sql));
 
-		public string DeleteAll() {
-			return String.Format(DELETE_ALL_FORMAT, _name);
-		}
+            return sql;
+        }
 
-		public string Delete(CachedProperty key, string keyParam) {
-			return String.Format(DELETE_FORMAT, _name, key.Name, keyParam);
-		}
+        public string Update(IDictionary<string, CachedProperty> properties, CachedProperty key, string keyParam)
+        {
+            var clauses = properties.Select(kvp => String.Format(UPDATE_PARAM_FORMAT, kvp.Value.Name, kvp.Key));
 
-		public string DeleteMany(CachedProperty key, string keysParam) {
-			return String.Format(DELETE_MANY_FORMAT, _name, key.Name, keysParam);
-		}
+            string sql = String.Format(UPDATE_FORMAT, _name, String.Join(", ", clauses), key.Name, keyParam);
+            Debug.WriteLine(String.Format("Update :: sql = {0}", sql));
+
+            return sql;
+        }
+
+        public string UpdateMany(IDictionary<string, CachedProperty> properties, CachedProperty key, string keysParam)
+        {
+            var clauses = properties.Select(kvp => String.Format(UPDATE_PARAM_FORMAT, kvp.Value.Name, kvp.Key));
+
+            string sql = String.Format(UPDATE_MANY_FORMAT, _name, String.Join(", ", clauses), key.Name, keysParam);
+            Debug.WriteLine(String.Format("UpdateMany :: sql = {0}", sql));
+
+            return sql;
+        }
+
+        public string DeleteAll()
+        {
+            string sql = String.Format(DELETE_ALL_FORMAT, _name);
+            Debug.WriteLine(String.Format("DeleteAll :: sql = {0}", sql));
+
+            return sql;
+        }
+
+        public string Delete(CachedProperty key, string keyParam)
+        {
+            string sql = String.Format(DELETE_FORMAT, _name, key.Name, keyParam);
+            Debug.WriteLine(String.Format("Delete :: sql = {0}", sql));
+
+            return sql;
+        }
+
+        public string DeleteMany(CachedProperty key, string keysParam)
+        {
+            string sql = String.Format(DELETE_MANY_FORMAT, _name, key.Name, keysParam);
+            Debug.WriteLine(String.Format("DeleteMany :: sql = {0}", sql));
+
+            return sql;
+        }
 
         /// <summary>
         /// Formats the name of the SQL parameter such as including the : before the param name.
@@ -135,29 +181,9 @@ namespace Haberdasher.Tailors
                 return string.Empty;
             }
 
-            string cleanName = Clean(paramName);
-            string name = String.Format("{0}{1}",STR_SqlParamIndicator, cleanName);
-            return name;
-        }
-
-        /// <summary>
-        /// remove the initial character if its a reserved character
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>System.String.</returns>
-        private static string Clean(string name)
-        {
-            if (!string.IsNullOrEmpty(name))
-            {
-                switch (name[0])
-                {
-                    case '@':
-                    case ':':
-                    case '?':
-                        return name.Substring(1);
-                }
-            }
-            return name;
+            string cleanName = paramName.RemoveParamIdentifier();
+            string nameWithIdentifier = String.Format("{0}{1}",STR_SqlParamIndicator, cleanName);
+            return nameWithIdentifier;
         }
 	}
 }

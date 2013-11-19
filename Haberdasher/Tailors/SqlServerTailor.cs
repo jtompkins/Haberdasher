@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Haberdasher.Support;
 
 namespace Haberdasher.Tailors
 {
@@ -27,6 +28,8 @@ namespace Haberdasher.Tailors
 		private const string DELETE_ALL_FORMAT = "truncate table [{0}]";
 		private const string DELETE_FORMAT = "delete from [{0}] where {1} = {2}";
 		private const string DELETE_MANY_FORMAT = "delete from [{0}] where {1} in {2}";
+
+        public const string STR_SqlParamIndicator = "@";
 
 		#endregion
 
@@ -116,7 +119,8 @@ namespace Haberdasher.Tailors
 		}
 
         /// <summary>
-        /// Formats the name of the SQL parameter such as including the @ before the param name.
+        /// Formats the name of the SQL parameter such as including the : before the param name.
+        /// Passing in "Id" returns ":Id"
         /// </summary>
         /// <param name="paramName">Name of the parameter.</param>
         /// <returns>System.String.</returns>
@@ -127,29 +131,9 @@ namespace Haberdasher.Tailors
                 return string.Empty;
             }
 
-            string cleanName = Clean(paramName);
-            string name = String.Format("@{0}", cleanName);
-            return name;
-        }
-
-        /// <summary>
-        /// remove the initial character if its a reserved character
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>System.String.</returns>
-        private static string Clean(string name)
-        {
-            if (!string.IsNullOrEmpty(name))
-            {
-                switch (name[0])
-                {
-                    case '@':
-                    case ':':
-                    case '?':
-                        return name.Substring(1);
-                }
-            }
-            return name;
+            string cleanName = paramName.RemoveParamIdentifier();
+            string nameWithIdentifier = String.Format("{0}{1}", STR_SqlParamIndicator, cleanName);
+            return nameWithIdentifier;
         }
     }
 }

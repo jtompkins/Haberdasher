@@ -190,7 +190,8 @@ namespace Haberdasher
 			decimal identity;
 
 			using (var connection = GetConnection()) {
-				identity = connection.Query<decimal>(_tailor.Insert(properties, _key), parameters).Single();
+                string sql = _tailor.Insert(properties, _key);
+				identity = connection.Query<decimal>(sql, parameters).Single();
 			}
 
 			return _key.IsIdentity ? (TKey)Convert.ChangeType(identity, typeof(TKey)) : (TKey)_key.Getter(entity);

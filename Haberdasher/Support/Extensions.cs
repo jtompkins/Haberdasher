@@ -54,5 +54,28 @@ namespace Haberdasher.Support
 			if (Nullable.GetUnderlyingType(type) != null) return true; // Nullable<T>
 			return false; // value-type
 		}
+
+        /// <summary>
+        /// Removes the parameter identifier from the given param name. 
+        /// In other words, given "@id", it returns "id"
+        /// </summary>
+        /// <param name="paramName">Name of the parameter.</param>
+        /// <returns>System.String.</returns>
+        public static string RemoveParamIdentifier(this string paramName)
+        {
+            // the common identifiers used for to indicate a sql parameter name
+            if (!string.IsNullOrEmpty(paramName))
+            {
+                switch (paramName[0])
+                {
+                    case '@':
+                    case ':':
+                    case '?':
+                        return paramName.Substring(1);
+                }
+            }
+            return paramName;
+        }
+
 	}
 }
