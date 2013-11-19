@@ -52,6 +52,29 @@ namespace Haberdasher
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string (not the configuration name).</param>
+        /// <param name="tailor">The tailor.</param>
+        /// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
+        protected Haberdashery(string connectionString, ITailor tailor)
+            : this()
+        {
+            _tailor = tailor;
+
+            if (!String.IsNullOrEmpty(connectionString))
+            {
+                _connectionString = connectionString;
+            }
+            else
+            {
+                throw new ArgumentException("A connection string must be specified.");
+            }
+        }
+
+
+
 		protected Haberdashery(string name, string connectionString = null, ITailor tailor = null) : this() {
 			_tailor = tailor ?? new SqlServerTailor(name);
 
@@ -268,7 +291,7 @@ namespace Haberdasher
 		#endregion
 
 		#region Utilities
-		private IDbConnection GetConnection() {
+		protected virtual IDbConnection GetConnection() {
 			if (_connection != null)
 				return _connection;
 
