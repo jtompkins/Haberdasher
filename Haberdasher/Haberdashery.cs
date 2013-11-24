@@ -22,9 +22,9 @@ namespace Haberdasher
 		#region Properties
 
 		private readonly Type _entityType;
-		private readonly ITailor _tailor;
-		private readonly string _connectionString;
-		private readonly IDbConnection _connection;
+		protected ITailor _tailor;
+		protected string _connectionString;
+		protected readonly IDbConnection _connection;
 
 		protected readonly IDictionary<TKey, TEntity> _entityCache;
 
@@ -51,6 +51,29 @@ namespace Haberdasher
 		static Haberdashery() {
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
+        /// </summary>
+        /// <param name="connectionString">The connection string (not the configuration name).</param>
+        /// <param name="tailor">The tailor.</param>
+        /// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
+        protected Haberdashery(string connectionString, ITailor tailor)
+            : this()
+        {
+            _tailor = tailor;
+
+            if (!String.IsNullOrEmpty(connectionString))
+            {
+                _connectionString = connectionString;
+            }
+            else
+            {
+                throw new ArgumentException("A connection string must be specified.");
+            }
+        }
+
+
 
 		protected Haberdashery(string name, string connectionString = null, ITailor tailor = null) : this() {
 			_tailor = tailor ?? new SqlServerTailor(name);
@@ -116,7 +139,8 @@ namespace Haberdasher
 			TEntity entity;
 
 			using (var connection = GetConnection()) {
-				entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, "@id"), parameters).FirstOrDefault();
+                string keyParamName = _tailor.FormatSqlParamName("id");
+                entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, keyParamName), parameters).FirstOrDefault();
 			}
 
 			return entity;
@@ -134,7 +158,8 @@ namespace Haberdasher
 			IEnumerable<TEntity> entities;
 
 			using (var connection = GetConnection()) {
-				entities = connection.Query<TEntity>(_tailor.SelectMany(_selectFields, _key, "@keys"), parameters).ToList();
+                string keyParamName = _tailor.FormatSqlParamName("keys");
+				entities = connection.Query<TEntity>(_tailor.SelectMany(_selectFields, _key, keyParamName), parameters).ToList();
 			}
 
 			if (entities.Any())
@@ -188,7 +213,8 @@ namespace Haberdasher
 			decimal identity;
 
 			using (var connection = GetConnection()) {
-				identity = connection.Query<decimal>(_tailor.Insert(properties, _key), parameters).Single();
+                string sql = _tailor.Insert(properties, _key);
+				identity = connection.Query<decimal>(sql, parameters).Single();
 			}
 
 			return _key.IsIdentity ? (TKey)Convert.ChangeType(identity, typeof(TKey)) : (TKey)_key.Getter(entity);
@@ -215,7 +241,8 @@ namespace Haberdasher
 			if (properties.Count <= 0) return result;
 
 			using (var connection = GetConnection()) {
-				result = connection.Execute(_tailor.Update(properties, _key, "@" + _key.Property), parameters);
+                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+				result = connection.Execute(_tailor.Update(properties, _key, keyParamName), parameters);
 			}
 
 			return result;
@@ -236,7 +263,8 @@ namespace Haberdasher
 			int result;
 
 			using (var connection = GetConnection()) {
-				result = connection.Execute(_tailor.Delete(_key, "@" + _key.Property), parameters);
+                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+                result = connection.Execute(_tailor.Delete(_key, keyParamName), parameters);
 			}
 
 			return result;
@@ -253,7 +281,8 @@ namespace Haberdasher
 			int result;
 
 			using (var connection = GetConnection()) {
-				result = connection.Execute(_tailor.DeleteMany(_key, "@" + _key.Property), parameters);
+                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+				result = connection.Execute(_tailor.DeleteMany(_key, keyParamName), parameters);
 			}
 
 			return result;
@@ -262,7 +291,7 @@ namespace Haberdasher
 		#endregion
 
 		#region Utilities
-		private IDbConnection GetConnection() {
+		protected virtual IDbConnection GetConnection() {
 			if (_connection != null)
 				return _connection;
 
@@ -279,7 +308,7 @@ namespace Haberdasher
 				if (property == null || String.IsNullOrEmpty(property.Name))
 					continue;
 
-				var key = "@" + property.Name;
+                var key = _tailor.FormatSqlParamName(property.Name);
 
 				if (!propertyList.ContainsKey(key))
 					propertyList.Add(key, property);

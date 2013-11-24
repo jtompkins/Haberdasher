@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Haberdasher.Support;
 
 namespace Haberdasher.Tailors
 {
@@ -27,6 +28,8 @@ namespace Haberdasher.Tailors
 		private const string DELETE_ALL_FORMAT = "truncate table [{0}]";
 		private const string DELETE_FORMAT = "delete from [{0}] where {1} = {2}";
 		private const string DELETE_MANY_FORMAT = "delete from [{0}] where {1} in {2}";
+
+        public const string STR_SqlParamIndicator = "@";
 
 		#endregion
 
@@ -114,5 +117,23 @@ namespace Haberdasher.Tailors
 		public string DeleteMany(CachedProperty key, string keysParam) {
 			return String.Format(DELETE_MANY_FORMAT, _name, key.Name, keysParam);
 		}
-	}
+
+        /// <summary>
+        /// Formats the name of the SQL parameter such as including the : before the param name.
+        /// Passing in "Id" returns ":Id"
+        /// </summary>
+        /// <param name="paramName">Name of the parameter.</param>
+        /// <returns>System.String.</returns>
+        public string FormatSqlParamName(string paramName)
+        {
+            if (string.IsNullOrWhiteSpace(paramName))
+            {
+                return string.Empty;
+            }
+
+            string cleanName = paramName.RemoveParamIdentifier();
+            string nameWithIdentifier = String.Format("{0}{1}", STR_SqlParamIndicator, cleanName);
+            return nameWithIdentifier;
+        }
+    }
 }
