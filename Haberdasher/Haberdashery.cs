@@ -22,9 +22,9 @@ namespace Haberdasher
 		#region Properties
 
 		private readonly Type _entityType;
-		private readonly ITailor _tailor;
-		private readonly string _connectionString;
-		private readonly IDbConnection _connection;
+		protected ITailor _tailor;
+		protected string _connectionString;
+		protected readonly IDbConnection _connection;
 
 		protected readonly IDictionary<TKey, TEntity> _entityCache;
 

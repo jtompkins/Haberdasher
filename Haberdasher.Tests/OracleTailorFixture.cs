@@ -59,6 +59,26 @@ namespace Haberdasher.Tests
 				Assert.Equal(expectedSql, sql);
 			}
 
+            [Fact]
+            public void CreatesWellFormedInsertWhenKeyWithNoIdentity()
+            {
+                var classWithNoIdentityType = typeof(NonIdentityKeyClass);
+
+                var idProperty = new CachedProperty(classWithNoIdentityType.GetProperty("Id"));
+                var nameProperty = new CachedProperty(classWithNoIdentityType.GetProperty("Name"));
+
+                var tailor = new OracleTailor("NonIdentityKeyClass");
+
+                var properties = new Dictionary<string, CachedProperty>();
+
+                properties.Add(":name", _nameProperty);
+
+                var sql = tailor.Insert(properties, idProperty);
+                var expectedSql = @"insert into ""NonIdentityKeyClass"" (Id, Name) values (:Id, :name)";
+
+                Assert.Equal(expectedSql, sql);
+            }
+
 			[Fact]
 			public void CreatesWellFormedUpdate() {
 				var properties = new Dictionary<string, CachedProperty>();

@@ -6,5 +6,8 @@ namespace Haberdasher.Tests.TestClasses
 	{
 		[Key(false)]
 		public long Id { get; set; }
+
+        public string Name { get; set; }
+
 	}
 }

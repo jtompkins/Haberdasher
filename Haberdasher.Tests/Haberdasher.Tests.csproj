@@ -53,6 +53,8 @@
     <Compile Include="CachedTypeFixture.cs" />
     <Compile Include="DelegateMethodTextFixture.cs" />
     <Compile Include="HaberdasheryFixture.cs" />
+    <Compile Include="Oracle\OracleHaberdasheryFixture.cs" />
+    <Compile Include="Oracle\OracleHaberdasheries.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="OracleTailorFixture.cs" />
     <Compile Include="SqlServerTailorFixture.cs" />
@@ -74,6 +76,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

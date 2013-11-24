@@ -107,21 +107,24 @@ namespace Haberdasher.Tailors
 
             string sql = String.Format(INSERT_FORMAT, _name, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
 
-            // if key is set by a trigger, retrieve the value using plsql block 
-            if (key.IsIdentity)
-            {
-                string plsql = String.Format(@"declare
-                                   newId number;
-                                 begin
-                                   {0} returning {1} into newId;
-                                 end;", sql, key.Name);
-
-                sql = plsql;
-            }
-
             Debug.WriteLine(String.Format("Insert :: sql = {0}", sql));
 
             return sql;
+        }
+
+        public string InsertWithIdentity(IDictionary<string, CachedProperty> properties, CachedProperty key)
+        {
+            string sql = Insert(properties, key);
+
+            string keyParamName = this.FormatSqlParamName(key.Name);
+            // if key is set by a trigger, retrieve the value using plsql block 
+            string plsql = String.Format(@"begin
+                                            {0} returning {1} into {2};
+                                           end;", sql, key.Name, keyParamName);
+
+            Debug.WriteLine(String.Format("Insert :: sql = {0}", plsql));
+
+            return plsql;
         }
 
         public string Update(IDictionary<string, CachedProperty> properties, CachedProperty key, string keyParam)
