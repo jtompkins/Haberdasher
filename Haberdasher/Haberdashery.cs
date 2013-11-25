@@ -25,6 +25,7 @@ namespace Haberdasher
 		protected ITailor _tailor;
 		protected string _connectionString;
 		protected readonly IDbConnection _connection;
+		protected readonly bool _useProvidedConnection;
 
 		protected readonly IDictionary<TKey, TEntity> _entityCache;
 
@@ -52,30 +53,28 @@ namespace Haberdasher
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
-        /// </summary>
-        /// <param name="connectionString">The connection string (not the configuration name).</param>
-        /// <param name="tailor">The tailor.</param>
-        /// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
-        protected Haberdashery(string connectionString, ITailor tailor)
-            : this()
-        {
-            _tailor = tailor;
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
+		/// </summary>
+		/// <param name="connectionString">The connection string (not the configuration name).</param>
+		/// <param name="tailor">The tailor.</param>
+		/// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
+		protected Haberdashery(string connectionString, ITailor tailor)
+			: this() {
+			_tailor = tailor;
 
-            if (!String.IsNullOrEmpty(connectionString))
-            {
-                _connectionString = connectionString;
-            }
-            else
-            {
-                throw new ArgumentException("A connection string must be specified.");
-            }
-        }
+			if (!String.IsNullOrEmpty(connectionString)) {
+				_connectionString = connectionString;
+			}
+			else {
+				throw new ArgumentException("A connection string must be specified.");
+			}
+		}
 
 
 
-		protected Haberdashery(string name, string connectionString = null, ITailor tailor = null) : this() {
+		protected Haberdashery(string name, string connectionString = null, ITailor tailor = null)
+			: this() {
 			_tailor = tailor ?? new SqlServerTailor(name);
 
 			if (!String.IsNullOrEmpty(connectionString)) {
@@ -89,11 +88,13 @@ namespace Haberdasher
 			}
 		}
 
-		protected Haberdashery(string name, IDbConnection connection, ITailor tailor = null) : this() {
+		protected Haberdashery(string name, IDbConnection connection, ITailor tailor = null)
+			: this() {
 			if (connection == null)
 				throw new ArgumentException("A valid IDbConnection must be given.");
 
 			_connection = connection;
+			_useProvidedConnection = true;
 			_tailor = tailor ?? new SqlServerTailor(name);
 		}
 
@@ -136,14 +137,18 @@ namespace Haberdasher
 
 			parameters.Add("id", key);
 
-			TEntity entity;
+			var connection = GetConnection();
 
-			using (var connection = GetConnection()) {
-                string keyParamName = _tailor.FormatSqlParamName("id");
-                entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, keyParamName), parameters).FirstOrDefault();
+			try {
+				var keyParamName = _tailor.FormatSqlParamName("id");
+				var entity = connection.Query<TEntity>(_tailor.Select(_selectFields, _key, keyParamName), parameters).FirstOrDefault();
+
+				return entity;
 			}
-
-			return entity;
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
+			}
 		}
 
 		public virtual IEnumerable<TEntity> Get(IEnumerable<TKey> keys) {
@@ -157,9 +162,15 @@ namespace Haberdasher
 
 			IEnumerable<TEntity> entities;
 
-			using (var connection = GetConnection()) {
-                string keyParamName = _tailor.FormatSqlParamName("keys");
+			var connection = GetConnection();
+
+			try {
+				var keyParamName = _tailor.FormatSqlParamName("keys");
 				entities = connection.Query<TEntity>(_tailor.SelectMany(_selectFields, _key, keyParamName), parameters).ToList();
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 
 			if (entities.Any())
@@ -173,8 +184,14 @@ namespace Haberdasher
 
 			IEnumerable<TEntity> entities;
 
-			using (var connection = GetConnection()) {
+			var connection = GetConnection();
+
+			try {
 				entities = connection.Query<TEntity>(sql, param);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 
 			return entities ?? new List<TEntity>();
@@ -185,9 +202,6 @@ namespace Haberdasher
 
 			var entity = entities.FirstOrDefault();
 
-			if (entity == null)
-				return null;
-
 			return entity;
 		}
 
@@ -196,8 +210,14 @@ namespace Haberdasher
 
 			IEnumerable<TEntity> result;
 
-			using (var connection = GetConnection()) {
+			var connection = GetConnection();
+
+			try {
 				result = connection.Query<TEntity>(query);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 
 			return result;
@@ -212,9 +232,15 @@ namespace Haberdasher
 
 			decimal identity;
 
-			using (var connection = GetConnection()) {
-                string sql = _tailor.Insert(properties, _key);
+			var connection = GetConnection();
+
+			try {
+				var sql = _tailor.Insert(properties, _key);
 				identity = connection.Query<decimal>(sql, parameters).Single();
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 
 			return _key.IsIdentity ? (TKey)Convert.ChangeType(identity, typeof(TKey)) : (TKey)_key.Getter(entity);
@@ -240,9 +266,15 @@ namespace Haberdasher
 
 			if (properties.Count <= 0) return result;
 
-			using (var connection = GetConnection()) {
-                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+			var connection = GetConnection();
+
+			try {
+				var keyParamName = _tailor.FormatSqlParamName(_key.Property);
 				result = connection.Execute(_tailor.Update(properties, _key, keyParamName), parameters);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 
 			return result;
@@ -262,9 +294,15 @@ namespace Haberdasher
 
 			int result;
 
-			using (var connection = GetConnection()) {
-                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
-                result = connection.Execute(_tailor.Delete(_key, keyParamName), parameters);
+			var connection = GetConnection();
+
+			try {
+				var keyParamName = _tailor.FormatSqlParamName(_key.Property);
+				result = connection.Execute(_tailor.Delete(_key, keyParamName), parameters);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 
 			return result;
@@ -280,9 +318,15 @@ namespace Haberdasher
 
 			int result;
 
-			using (var connection = GetConnection()) {
-                string keyParamName = _tailor.FormatSqlParamName(_key.Property);
+			var connection = GetConnection();
+
+			try {
+				var keyParamName = _tailor.FormatSqlParamName(_key.Property);
 				result = connection.Execute(_tailor.DeleteMany(_key, keyParamName), parameters);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 
 			return result;
@@ -292,7 +336,7 @@ namespace Haberdasher
 
 		#region Utilities
 		protected virtual IDbConnection GetConnection() {
-			if (_connection != null)
+			if (_useProvidedConnection && _connection != null)
 				return _connection;
 
 			if (String.IsNullOrEmpty(_connectionString))
@@ -308,7 +352,7 @@ namespace Haberdasher
 				if (property == null || String.IsNullOrEmpty(property.Name))
 					continue;
 
-                var key = _tailor.FormatSqlParamName(property.Name);
+				var key = _tailor.FormatSqlParamName(property.Name);
 
 				if (!propertyList.ContainsKey(key))
 					propertyList.Add(key, property);
