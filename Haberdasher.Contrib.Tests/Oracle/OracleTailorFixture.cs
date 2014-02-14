@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Haberdasher.Tailors;
+using Haberdasher.Contrib.Oracle.Tailors;
 using Haberdasher.Tests.TestClasses;
 using Xunit;
 
-namespace Haberdasher.Tests
+namespace Haberdasher.Contrib.Tests.Oracle
 {
 	public class OracleTailorFixture
 	{

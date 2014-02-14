@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using Haberdasher.Tests.TestClasses;
 using Xunit;
-using System.IO;
-using System.Diagnostics;
 
-namespace Haberdasher.Tests
+namespace Haberdasher.Contrib.Tests.Oracle
 {
 	public class OracleHaberdasheryFixture
 	{

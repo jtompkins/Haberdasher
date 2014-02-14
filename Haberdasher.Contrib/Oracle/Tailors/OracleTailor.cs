@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Haberdasher.Support;
+using Haberdasher.Tailors;
 
-namespace Haberdasher.Tailors
+namespace Haberdasher.Contrib.Oracle.Tailors
 {
 	public class OracleTailor : ITailor
 	{

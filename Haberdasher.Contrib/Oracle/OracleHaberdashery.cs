@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Xml;
-using Dapper;
-using Haberdasher.Contracts;
-using Haberdasher.Tailors;
-using Oracle.ManagedDataAccess.Client;
 using System.Diagnostics;
+using Dapper;
+using Haberdasher.Contrib.Oracle.Tailors;
+using Oracle.ManagedDataAccess.Client;
 
-
-namespace Haberdasher
+namespace Haberdasher.Contrib.Oracle
 {
     /// <summary>
     /// the OracleHaberdashery is an abstract base class to retrieve data from an Oracle table using the Oracle Managed Provider by default
