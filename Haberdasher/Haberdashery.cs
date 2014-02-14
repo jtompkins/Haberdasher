@@ -111,20 +111,38 @@ namespace Haberdasher
 		#region Dapper Wrappers
 
 		public IEnumerable<TEntity> Query(string sql, object param = null, SqlTransaction transaction = null, bool buffered = true) {
-			using (var connection = GetConnection()) {
+			var connection = GetConnection();
+
+			try {
 				return connection.Query<TEntity>(sql, param, transaction, buffered);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 		}
 
 		public IEnumerable<T> Query<T>(string sql, object param = null, SqlTransaction transaction = null, bool buffered = true) {
-			using (var connection = GetConnection()) {
+			var connection = GetConnection();
+
+			try {
 				return connection.Query<T>(sql, param, transaction, buffered);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 		}
 
 		public int Execute(string sql, object param = null, SqlTransaction transaction = null) {
-			using (var connection = GetConnection()) {
+			var connection = GetConnection();
+
+			try {
 				return connection.Execute(sql, param, transaction);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
 			}
 		}
 
