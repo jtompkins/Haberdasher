@@ -10,7 +10,7 @@ Haberdasher is available via [Nuget](http://www.nuget.org/). Install from the Pa
 
 ## Preparing your app for Haberdasher
 
-Even though Haberdasher isn't an ORM in the traditional sense, some of the same concepts apply. Haberdasher conceptualizes your database as a series of entity types mapped one-to-one to tables in your database. Your entities are basic POCO classes plus a few simple annotations. Actual communication with your database is done though a context-ish base class called a `Haberdashery`, which you'll extend for each of your entity types.
+Even though Haberdasher isn't an ORM in the traditional sense, some of the same concepts apply. Haberdasher conceptualizes your database as a series of entity types mapped one-to-one to tables in your database. Your entities are basic POCO classes plus a few simple annotations. Actual communication with your database is done though a context-ish base class called a `SqlTable`, which you'll extend for each of your entity types.
 
 ### Annotate your entities
 
@@ -64,24 +64,24 @@ When generating SQL for database reads and writes, Haberdasher will include all 
 		}
 	}
 
-### Extend the Haberdashery class
+### Extend the SqlTable class
 
-You'll talk to your database using classes that extend the `Haberdashery` base class, which provides methods for database access. You'll need to extend the `Haberdashery` class for each of your entity types.
+You'll talk to your database using classes that extend the `SqlTable` base class, which provides methods for database access. You'll need to extend the `SqlTable` class for each of your entity types.
 
-	public class ProductsHaberdashery : Haberdashery<Product, int> {
-		public ProductsHaberdashery("Products")() {
+	public class ProductsSqlTable : SqlTable<Product, int> {
+		public ProductsSqlTable("Products")() {
 		}
 	}
 
-`Haberdashery` is a generic type with two arguments - the type of your entity, and the type of the primary key.
+`SqlTable` is a generic type with two arguments - the type of your entity, and the type of the primary key.
 
-The `Haberdashery` class has no public constructors - you are intended to define your own constructor and call the protected constructors with the appropriate arguments.
+The `SqlTable` class has no public constructors - you are intended to define your own constructor and call the protected constructors with the appropriate arguments.
 
 The protected constructor takes three arguments:
 
 Argument | Type | Description
 --- | --- | ---
-name | `String` | The name of the table to which this Haberdashery is mapped.
+name | `String` | The name of the table to which this SqlTable is mapped.
 connectionString | `String` | The name of the connection string in your config file. If you don't provide this argument, Haberdasher will choose the first connection string it finds.
 tailor | `ITailor` | An instance of a class that implements the `ITailor` interface (*defaults to an instance of the `SqlServerTailor`* - see *Extending Haberdasher*, below, for more info).
 
@@ -98,27 +98,27 @@ Haberdasher has a small API surface. For this walkthrough, we'll be using the fo
 		public int AvailableQuantity { get; set; }
 	}
 	
-	public class ProductsHaberdashery : Haberdashery<Product, int> {
-		public ProductsHaberdashery("Products")() {
+	public class ProductsSqlTable : SqlTable<Product, int> {
+		public ProductsSqlTable("Products")() {
 		}
 	}
 
 ### Getting entities by key
 
-	var context = new ProductsHaberdashery();
+	var context = new ProductsSqlTable();
 	var product = context.Get(1);
 	var products = context.Get(new [1, 2, 3]);
 
 ### Getting all entities
 
-	var context = new ProductsHaberdashery();	
+	var context = new ProductsSqlTable();	
 	var allProducts = context.All();
 
 ### Querying Entities
 
 Haberdasher gives two simple query methods, `Find` and `First`. Both take a `String` argument containing the SQL `WHERE` clause:
 
-	var context = new ProductsHaberdashery();
+	var context = new ProductsSqlTable();
 	
 	var productsOverTenDollars = context.Find("Price > 10.0");
 	var firstProductOverTen = context.First("Price > 10.0");
@@ -131,7 +131,7 @@ You also have access to the base Dapper query methods, `Query` (returns an `IEnu
 
 ### Inserting an entity into the database
 
-Calling `Insert` on the Haberdashery returns the new primary key:
+Calling `Insert` on the SqlTable returns the new primary key:
 
 	var product = new Product() { 
 									Name = "Test", 
@@ -139,7 +139,7 @@ Calling `Insert` on the Haberdashery returns the new primary key:
 									AvailableQuantity = 1 
 								};
 
-	var context = new ProductsHaberdashery();
+	var context = new ProductsSqlTable();
 	var newId = context.Insert(product);
 
 ### Updating an existing entity
@@ -148,22 +148,22 @@ Calling `Update` with a single entity or list of entities returns the number of 
 
 	product.Name = "Test Again";
 	
-	var context = new ProductsHaberdashery();
+	var context = new ProductsSqlTable();
 	var updated = context.Update(product);
 
 ### Deleting an entity
 
 Calling `Delete` with a single key or list of keys returns the number of deleted rows:
 	
-	var context = new ProductsHaberdashery();
+	var context = new ProductsSqlTable();
 	var deleted = context.Delete(product.Id);
 
 ## Extending Haberdasher
 
-All of the methods on the `Haberdashery` class are `virtual` and can be overriden in your code:
+All of the methods on the `SqlTable` class are `virtual` and can be overriden in your code:
 
-	public class ProductsHaberdashery : Haberdashery<Product, int> {
-		public ProductsHaberdashery("Products")() {
+	public class ProductsSqlTable : SqlTable<Product, int> {
+		public ProductsSqlTable("Products")() {
 		}
 		
 		// make sure the .All method only returns available products.
@@ -175,9 +175,9 @@ All of the methods on the `Haberdashery` class are `virtual` and can be override
 
 ### Adding support for additional databases
 
-Since Haberdasher interacts with the database (via Dapper, of course) by generating SQL, it can be used on any database that Dapper and ADO.NET supports. Unfortunately, not every database uses SQL in quite the same way. Haberdasher allows you to override its built-in SQL generation (which produces SQL Server-supported SQL) by creating types that implement the `ITailor` interface:
+Since Haberdasher interacts with the database (via Dapper, of course) by generating SQL, it can be used on any database that Dapper and ADO.NET supports. Unfortunately, not every database uses SQL in quite the same way. Haberdasher allows you to override its built-in SQL generation (which produces SQL Server-supported SQL) by creating types that implement the `ISqlBuilder` interface:
 
-	public interface ITailor
+	public interface ISqlBuilder
     {
     	string SelectAll(IEnumerable<CachedProperty> properties);
         string Select(IEnumerable<CachedProperty> properties, CachedProperty key, string keyParam);
@@ -193,7 +193,7 @@ Since Haberdasher interacts with the database (via Dapper, of course) by generat
         string DeleteMany(CachedProperty key, string keysParam);
 	}
 	
-Haberdasher comes with one implementation of `ITailor`, the `SqlServerTailor` class. Check out the [source](https://github.com/jtompkins/envelopes-api/blob/master/src/Haberdasher/Tailors/SqlServerTailor.cs) for more information on implementing the `ITailor` methods.
+Haberdasher comes with one implementation of `ISqlBuilder`, the `SqlServerSqlBuilder` class. Check out the [source](https://github.com/jtompkins/envelopes-api/blob/master/src/Haberdasher/SqlBuilders/SqlServerSqlBuilder.cs) for more information on implementing the `ISqlBuilder` methods.
 
 ## Contributing to Haberdasher
 
