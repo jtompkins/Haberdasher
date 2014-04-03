@@ -3,6 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using Dapper;
 using Haberdasher.Contrib.Oracle.Tailors;
+using Haberdasher.Tailors;
 using Oracle.ManagedDataAccess.Client;
 
 namespace Haberdasher.Contrib.Oracle
@@ -16,23 +17,30 @@ namespace Haberdasher.Contrib.Oracle
     {
 
         #region Constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
-        /// </summary>
-        /// <param name="connectionString">The connection string (not the configuration name).</param>
-        /// <param name="tailor">The tailor.</param>
-        /// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
-        protected OracleHaberdashery(string connectionString, OracleTailor tailor)
-            : base(connectionString, tailor)
-        {
 
-        }
+		/// <summary>
+		/// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
+		/// </summary>
+		/// <param name="connectionString">The connection string (not the configuration name).</param>
+		/// <param name="tailor">The tailor.</param>
+		/// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
+		protected OracleHaberdashery(string connectionString, ITailor tailor) {
+			_tailor = tailor;
+
+			if (!String.IsNullOrEmpty(connectionString)) {
+				_connectionString = connectionString;
+			}
+			else {
+				throw new ArgumentException("A connection string must be specified.");
+			}
+		}
 
         protected OracleHaberdashery(string name, string connectionStringConfigName = null)
             : base(name, connectionStringConfigName, new OracleTailor(name))
         {
 
         }
+
         #endregion
 
         public OracleTailor Tailor

@@ -4,7 +4,6 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Xml;
 using Dapper;
 using Haberdasher.Contracts;
 using Haberdasher.Tailors;
@@ -53,26 +52,6 @@ namespace Haberdasher
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
-		/// </summary>
-		/// <param name="connectionString">The connection string (not the configuration name).</param>
-		/// <param name="tailor">The tailor.</param>
-		/// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
-		protected Haberdashery(string connectionString, ITailor tailor)
-			: this() {
-			_tailor = tailor;
-
-			if (!String.IsNullOrEmpty(connectionString)) {
-				_connectionString = connectionString;
-			}
-			else {
-				throw new ArgumentException("A connection string must be specified.");
-			}
-		}
-
-
-
 		protected Haberdashery(string name, string connectionString = null, ITailor tailor = null)
 			: this() {
 			_tailor = tailor ?? new SqlServerTailor(name);
@@ -98,7 +77,7 @@ namespace Haberdasher
 			_tailor = tailor ?? new SqlServerTailor(name);
 		}
 
-		private Haberdashery() {
+		protected Haberdashery() {
 			_entityType = typeof(TEntity);
 			_entityCache = new Dictionary<TKey, TEntity>();
 
