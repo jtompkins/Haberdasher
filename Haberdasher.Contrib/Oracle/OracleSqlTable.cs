@@ -2,7 +2,7 @@
 using System.Data;
 using System.Diagnostics;
 using Dapper;
-using Haberdasher.Contrib.Oracle.Tailors;
+using Haberdasher.Contrib.Oracle.SqlBuilders;
 using Haberdasher.SqlBuilders;
 using Oracle.ManagedDataAccess.Client;
 
@@ -13,18 +13,18 @@ namespace Haberdasher.Contrib.Oracle
     /// </summary>
     /// <typeparam name="TEntity">The type of the t entity.</typeparam>
     /// <typeparam name="TKey">The type of the t key.</typeparam>
-    public abstract class OracleHaberdashery<TEntity, TKey> : Haberdashery<TEntity, TKey> where TEntity : class, new()
+    public abstract class OracleSqlTable<TEntity, TKey> : SqlTable<TEntity, TKey> where TEntity : class, new()
     {
 
         #region Constructors
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
+		/// Initializes a new instance of the <see cref="SqlTable{TEntity,TKey}"/> class.
 		/// </summary>
 		/// <param name="connectionString">The connection string (not the configuration name).</param>
 		/// <param name="sqlBuilder">The tailor.</param>
 		/// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
-		protected OracleHaberdashery(string connectionString, ISqlBuilder sqlBuilder) {
+		protected OracleSqlTable(string connectionString, ISqlBuilder sqlBuilder) {
 			_sqlBuilder = sqlBuilder;
 
 			if (!String.IsNullOrEmpty(connectionString)) {
@@ -35,7 +35,7 @@ namespace Haberdasher.Contrib.Oracle
 			}
 		}
 
-        protected OracleHaberdashery(string name, string connectionStringConfigName = null)
+        protected OracleSqlTable(string name, string connectionStringConfigName = null)
             : base(name, connectionStringConfigName, new OracleSqlBuilder(name))
         {
 

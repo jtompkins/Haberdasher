@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Haberdasher.Tests.TestClasses
 {
-	public class AliasedColumnsClassHaberdashery : Haberdashery<AliasedColumnsClass, int>
+	public class SimpleClassSqlTable : SqlTable<SimpleClass, int>
 	{
-		public AliasedColumnsClassHaberdashery() : base("AliasedClasses", "") {}
+		public SimpleClassSqlTable() : base("SimpleClasses", "") { }
 	}
 }

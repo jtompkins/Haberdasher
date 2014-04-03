@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Oracle\OracleHaberdashery.cs" />
+    <Compile Include="Oracle\OracleSqlTable.cs" />
     <Compile Include="Oracle\Tailors\OracleSqlBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

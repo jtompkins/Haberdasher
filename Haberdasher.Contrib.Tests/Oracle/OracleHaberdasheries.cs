@@ -8,9 +8,9 @@ namespace Haberdasher.Contrib.Tests.Oracle
     /// the SimpleClassOracleHaberdashery is an Oracle Haberdashery to store SimpleClass entities 
     /// in the SIMPLE_CLASSES table using the connection string named "OracleTest"
     /// </summary>
-	public class SimpleClassOracleHaberdashery : OracleHaberdashery<SimpleClass, int>
+	public class SimpleClassOracleSqlTable : OracleSqlTable<SimpleClass, int>
 	{
-        public SimpleClassOracleHaberdashery() : base("SIMPLE_CLASSES", "OracleTest") { }
+        public SimpleClassOracleSqlTable() : base("SIMPLE_CLASSES", "OracleTest") { }
 	}
 
     /// <summary>
@@ -18,9 +18,9 @@ namespace Haberdasher.Contrib.Tests.Oracle
     /// in the SIMPLE_CLASSES table using the connection string named "OracleTest"
     /// </summary>
     /// <remarks>SimpleClass and NonIdentityKeyClass have the same definition</remarks>
-    public class NonIdentityKeyOracleHaberdashery : OracleHaberdashery<NonIdentityKeyClass, long>
+    public class NonIdentityKeyOracleSqlTable : OracleSqlTable<NonIdentityKeyClass, long>
     {
-        public NonIdentityKeyOracleHaberdashery() : base("SIMPLE_CLASSES", "OracleTest") { }
+        public NonIdentityKeyOracleSqlTable() : base("SIMPLE_CLASSES", "OracleTest") { }
     }
 
 }

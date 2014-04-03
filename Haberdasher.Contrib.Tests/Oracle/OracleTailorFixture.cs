@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Haberdasher.Contrib.Oracle.Tailors;
+using Haberdasher.Contrib.Oracle.SqlBuilders;
 using Haberdasher.Tests.TestClasses;
 using Xunit;
 

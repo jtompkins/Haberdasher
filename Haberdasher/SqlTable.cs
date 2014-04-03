@@ -10,7 +10,7 @@ using Haberdasher.SqlBuilders;
 
 namespace Haberdasher
 {
-	public class Haberdashery<TEntity, TKey> : IHaberdashery<TEntity, TKey> where TEntity : class, new()
+	public class SqlTable<TEntity, TKey> : ISqlTable<TEntity, TKey> where TEntity : class, new()
 	{
 		#region Static Properties
 
@@ -48,11 +48,11 @@ namespace Haberdasher
 
 		#region Constructors
 
-		static Haberdashery() {
+		static SqlTable() {
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
 
-		protected Haberdashery(string name, string connectionString = null, ISqlBuilder sqlBuilder = null)
+		protected SqlTable(string name, string connectionString = null, ISqlBuilder sqlBuilder = null)
 			: this() {
 			_sqlBuilder = sqlBuilder ?? new SqlServerSqlBuilder(name);
 
@@ -67,7 +67,7 @@ namespace Haberdasher
 			}
 		}
 
-		protected Haberdashery(string name, IDbConnection connection, ISqlBuilder sqlBuilder = null)
+		protected SqlTable(string name, IDbConnection connection, ISqlBuilder sqlBuilder = null)
 			: this() {
 			if (connection == null)
 				throw new ArgumentException("A valid IDbConnection must be given.");
@@ -77,7 +77,7 @@ namespace Haberdasher
 			_sqlBuilder = sqlBuilder ?? new SqlServerSqlBuilder(name);
 		}
 
-		protected Haberdashery() {
+		protected SqlTable() {
 			_entityType = typeof(TEntity);
 			_entityCache = new Dictionary<TKey, TEntity>();
 

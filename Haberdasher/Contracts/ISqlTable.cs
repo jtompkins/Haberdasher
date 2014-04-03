@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Haberdasher.Contracts
 {
-	public interface IHaberdashery<TEntity, TKey> where TEntity : class, new()
+	public interface ISqlTable<TEntity, TKey> where TEntity : class, new()
 	{
 		IEnumerable<TEntity> Query(string sql, object param = null, SqlTransaction transaction = null, bool buffered = true);
 		IEnumerable<T> Query<T>(string sql, object param = null, SqlTransaction transaction = null, bool buffered = true);

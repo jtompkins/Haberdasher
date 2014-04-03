@@ -5,7 +5,7 @@ using System.Linq;
 using Haberdasher.SqlBuilders;
 using Haberdasher.Support;
 
-namespace Haberdasher.Contrib.Oracle.Tailors
+namespace Haberdasher.Contrib.Oracle.SqlBuilders
 {
 	public class OracleSqlBuilder : ISqlBuilder
 	{

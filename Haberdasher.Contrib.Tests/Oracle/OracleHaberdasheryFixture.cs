@@ -39,7 +39,7 @@ namespace Haberdasher.Contrib.Tests.Oracle
 	                            end if;
 	                            end;");
 
-			SimpleClassOracleHaberdashery db = new SimpleClassOracleHaberdashery();
+			SimpleClassOracleSqlTable db = new SimpleClassOracleSqlTable();
 
 			foreach (string ddl in statements) {
 				try {
@@ -56,7 +56,7 @@ namespace Haberdasher.Contrib.Tests.Oracle
 
 		[Fact(Skip = "No Oracle DB available.")]
 		public void InsertNewWithIdentityReturnsNewId() {
-			SimpleClassOracleHaberdashery db = new SimpleClassOracleHaberdashery();
+			SimpleClassOracleSqlTable db = new SimpleClassOracleSqlTable();
 
 			var simple = new SimpleClass { Name = "New Simple Class" };
 
@@ -71,7 +71,7 @@ namespace Haberdasher.Contrib.Tests.Oracle
 
 		[Fact(Skip = "No Oracle DB available.")]
 		public void InsertNewWithNoIdentityReturnsAssignedId() {
-			NonIdentityKeyOracleHaberdashery db = new NonIdentityKeyOracleHaberdashery();
+			NonIdentityKeyOracleSqlTable db = new NonIdentityKeyOracleSqlTable();
 
 			// 10 is an arbitrary key above the last sequence so should be unique
 			// inserting a duplicate id value will cause error in DB since violates primary key
@@ -89,7 +89,7 @@ namespace Haberdasher.Contrib.Tests.Oracle
 
 		[Fact(Skip = "No Oracle DB available.")]
 		public void InsertNewWithSequenceAndNoIdentityReturnsAssignedId() {
-			NonIdentityKeyOracleHaberdashery db = new NonIdentityKeyOracleHaberdashery();
+			NonIdentityKeyOracleSqlTable db = new NonIdentityKeyOracleSqlTable();
 			db.SequenceName = "SIMPLE_CLASSES_ID_SEQ";
 
 			var entityToInsert = new NonIdentityKeyClass { Name = "Has Key from Sequence" };
@@ -105,7 +105,7 @@ namespace Haberdasher.Contrib.Tests.Oracle
 
 		[Fact(Skip = "No Oracle DB available.")]
 		public void CanCRUD() {
-			SimpleClassOracleHaberdashery db = new SimpleClassOracleHaberdashery();
+			SimpleClassOracleSqlTable db = new SimpleClassOracleSqlTable();
 
 			// value of new name
 			const string STR_NewName = "I am new";

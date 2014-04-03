@@ -14,22 +14,22 @@ namespace Haberdasher.Tests
 		private readonly CachedType _simpleType;
 		private readonly CachedType _aliasedType;
 
-		private readonly SimpleClassHaberdashery _simpleHaberdashery;
-		private readonly AliasedColumnsClassHaberdashery _aliasedHaberdashery;
+		private readonly SimpleClassSqlTable _simpleSqlTable;
+		private readonly AliasedColumnsClassSqlTable _aliasedSqlTable;
 
 		public HaberdasheryFixture() {
 			_simpleType = new CachedType(typeof(SimpleClass));
 			_aliasedType = new CachedType(typeof(AliasedColumnsClass));
 
-			_simpleHaberdashery = new SimpleClassHaberdashery();
-			_aliasedHaberdashery = new AliasedColumnsClassHaberdashery();
+			_simpleSqlTable = new SimpleClassSqlTable();
+			_aliasedSqlTable = new AliasedColumnsClassSqlTable();
 		}
 
 		[Fact]
 		public void BuildsSimpleParameterListCorrectly() {
 			var simple = new SimpleClass {Id = 1, Name = "Simple Class"};
 
-			var parameters = _simpleHaberdashery.BuildParameterList(_simpleType.SelectFields, simple);
+			var parameters = _simpleSqlTable.BuildParameterList(_simpleType.SelectFields, simple);
 
 			Assert.Equal(2, parameters.ParameterNames.Count());
 			Assert.Equal(true, parameters.ParameterNames.Contains("Id"));
@@ -40,7 +40,7 @@ namespace Haberdasher.Tests
 		public void BuildsAliasedParameterListCorrectly() {
 			var aliased = new AliasedColumnsClass() {Id = 1, Name = "Aliased Class", Description = "Aliased Description"};
 
-			var parameters = _aliasedHaberdashery.BuildParameterList(_aliasedType.SelectFields, aliased);
+			var parameters = _aliasedSqlTable.BuildParameterList(_aliasedType.SelectFields, aliased);
 
 			Assert.Equal(3, parameters.ParameterNames.Count());
 			Assert.True(parameters.ParameterNames.Contains("Id"));
@@ -50,7 +50,7 @@ namespace Haberdasher.Tests
 
 		[Fact]
 		public void BuildsSimplePropertyListCorrectly() {
-			var properties = _simpleHaberdashery.BuildPropertyList(_simpleType.SelectFields);
+			var properties = _simpleSqlTable.BuildPropertyList(_simpleType.SelectFields);
 
 			Assert.Equal(2, properties.Count());
 			Assert.True(properties.ContainsKey("@Id"));
@@ -59,7 +59,7 @@ namespace Haberdasher.Tests
 
 		[Fact]
 		public void BuildsAliasedPropertyListCorrectly() {
-			var properties = _aliasedHaberdashery.BuildPropertyList(_aliasedType.SelectFields);
+			var properties = _aliasedSqlTable.BuildPropertyList(_aliasedType.SelectFields);
 
 			Assert.Equal(3, properties.Count());
 			Assert.True(properties.ContainsKey("@Id"));
