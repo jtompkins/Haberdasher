@@ -59,8 +59,8 @@
     <Compile Include="Support\Extensions.cs" />
     <Compile Include="Support\GetterBuilder.cs" />
     <Compile Include="Support\SetterBuilder.cs" />
-    <Compile Include="Tailors\ITailor.cs" />
-    <Compile Include="Tailors\SqlServerTailor.cs" />
+    <Compile Include="SqlBuilders\ISqlBuilder.cs" />
+    <Compile Include="SqlBuilders\SqlServerSqlBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

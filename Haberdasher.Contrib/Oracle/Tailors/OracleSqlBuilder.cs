@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Haberdasher.SqlBuilders;
 using Haberdasher.Support;
-using Haberdasher.Tailors;
 
 namespace Haberdasher.Contrib.Oracle.Tailors
 {
-	public class OracleTailor : ITailor
+	public class OracleSqlBuilder : ISqlBuilder
 	{
 		#region Constants
         // Oracle uses double quotes for literal table names 
@@ -38,7 +38,7 @@ namespace Haberdasher.Contrib.Oracle.Tailors
         // name of the table
 		private readonly string _name;
 
-        public OracleTailor(string name)
+        public OracleSqlBuilder(string name)
         {
 			_name = name;
 		}

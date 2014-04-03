@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Haberdasher.Support;
 
-namespace Haberdasher.Tailors
+namespace Haberdasher.SqlBuilders
 {
-	public class SqlServerTailor : ITailor
+	public class SqlServerSqlBuilder : ISqlBuilder
 	{
 		#region Constants
 
@@ -35,7 +35,7 @@ namespace Haberdasher.Tailors
 
 		private readonly string _name;
 
-		public SqlServerTailor(string name) {
+		public SqlServerSqlBuilder(string name) {
 			_name = name;
 		}
 

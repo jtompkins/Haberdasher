@@ -3,7 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using Dapper;
 using Haberdasher.Contrib.Oracle.Tailors;
-using Haberdasher.Tailors;
+using Haberdasher.SqlBuilders;
 using Oracle.ManagedDataAccess.Client;
 
 namespace Haberdasher.Contrib.Oracle
@@ -22,10 +22,10 @@ namespace Haberdasher.Contrib.Oracle
 		/// Initializes a new instance of the <see cref="Haberdashery{TEntity, TKey}"/> class.
 		/// </summary>
 		/// <param name="connectionString">The connection string (not the configuration name).</param>
-		/// <param name="tailor">The tailor.</param>
+		/// <param name="sqlBuilder">The tailor.</param>
 		/// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
-		protected OracleHaberdashery(string connectionString, ITailor tailor) {
-			_tailor = tailor;
+		protected OracleHaberdashery(string connectionString, ISqlBuilder sqlBuilder) {
+			_sqlBuilder = sqlBuilder;
 
 			if (!String.IsNullOrEmpty(connectionString)) {
 				_connectionString = connectionString;
@@ -36,16 +36,16 @@ namespace Haberdasher.Contrib.Oracle
 		}
 
         protected OracleHaberdashery(string name, string connectionStringConfigName = null)
-            : base(name, connectionStringConfigName, new OracleTailor(name))
+            : base(name, connectionStringConfigName, new OracleSqlBuilder(name))
         {
 
         }
 
         #endregion
 
-        public OracleTailor Tailor
+        public OracleSqlBuilder SqlBuilder
         {
-            get { return _tailor as OracleTailor; }
+            get { return _sqlBuilder as OracleSqlBuilder; }
         }
 
         /// <summary>
@@ -121,12 +121,12 @@ namespace Haberdasher.Contrib.Oracle
             var parameters = BuildParameterList(_insertFields, entity);
 
             // add an output parameter for the id
-            var paramNameForIdentity = _tailor.FormatSqlParamName(_key.Name);
+            var paramNameForIdentity = _sqlBuilder.FormatSqlParamName(_key.Name);
             parameters.Add(name: paramNameForIdentity, dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             using (var connection = GetConnection())
             {
-                string sql = this.Tailor.InsertWithIdentity(properties, _key);
+                string sql = this.SqlBuilder.InsertWithIdentity(properties, _key);
                 Debug.WriteLine(String.Format("InsertWithIdentityKey :: sql = {0}", sql));
 
                 connection.Execute(sql, parameters);
@@ -154,7 +154,7 @@ namespace Haberdasher.Contrib.Oracle
 
             using (var connection = GetConnection())
             {
-                string sql = _tailor.Insert(properties, _key);
+                string sql = _sqlBuilder.Insert(properties, _key);
                 Debug.WriteLine(String.Format("InsertWithNoIdentityKey :: sql = {0}", sql));
                 connection.Execute(sql, parameters);
 

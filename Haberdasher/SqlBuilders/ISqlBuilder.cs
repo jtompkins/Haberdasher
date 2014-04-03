@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Haberdasher.Tailors
+namespace Haberdasher.SqlBuilders
 {
-	public interface ITailor
+	public interface ISqlBuilder
 	{
 		string SelectAll(IEnumerable<CachedProperty> properties);
 		string Select(IEnumerable<CachedProperty> properties, CachedProperty key, string keyParam);
