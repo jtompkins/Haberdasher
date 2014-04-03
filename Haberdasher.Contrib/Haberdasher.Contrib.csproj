@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Oracle\OracleSqlTable.cs" />
-    <Compile Include="Oracle\Tailors\OracleSqlBuilder.cs" />
+    <Compile Include="Oracle\SqlBuilders\OracleSqlBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
