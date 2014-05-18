@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Haberdasher.QueryGenerators
+namespace Haberdasher.Contracts
 {
 	public interface IQueryGenerator
 	{
