@@ -4,10 +4,10 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Threading.Tasks;
 using Dapper;
 using Haberdasher.Contracts;
 using Haberdasher.QueryGenerators;
+using Haberdasher.Support.Helpers;
 
 namespace Haberdasher
 {
@@ -45,36 +45,61 @@ namespace Haberdasher
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
 
-		protected EntityStore(string name, string connectionString = null, IQueryGenerator queryGenerator = null)
-			: this() {
-			_queryGenerator = queryGenerator ?? new SqlServerGenerator(name);
-
-			if (!String.IsNullOrEmpty(connectionString)) {
-				_connectionString = ConfigurationManager.ConnectionStrings[connectionString].ConnectionString;
-			}
-			else if (ConfigurationManager.ConnectionStrings.Count > 0) {
-				_connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;
-			}
-			else {
-				throw new ArgumentException("A connection string must be specified, or there must be at least one connection string set in your configuration file.");
-			}
-		}
-
-		protected EntityStore(string name, IDbConnection connection, IQueryGenerator queryGenerator = null)
-			: this() {
-			if (connection == null)
-				throw new ArgumentException("A valid IDbConnection must be given.");
-
-			_connection = connection;
-			_useProvidedConnection = true;
-			_queryGenerator = queryGenerator ?? new SqlServerGenerator(name);
-		}
-
-		protected EntityStore() {
+		public EntityStore() {
 			_entityType = typeof(TEntity);
 
 			if (!CachedTypes.ContainsKey(_entityType))
 				CachedTypes.Add(_entityType, new CachedType(_entityType));
+
+			_connectionString = ConnectionStringHelper.FindFirst();
+			_queryGenerator = new SqlServerGenerator(PluralizationHelper.Pluralize(_entityType.Name));
+		}
+
+		public EntityStore(string name) : this() {
+			_queryGenerator = new SqlServerGenerator(name);
+		}
+
+		public EntityStore(IQueryGenerator generator) : this() {
+			_queryGenerator = generator;
+		} 
+
+		public EntityStore(string connectionString, string name = null) : this() {
+			_connectionString = ConnectionStringHelper.FindByName(connectionString);
+
+			name = String.IsNullOrEmpty(name)
+				? PluralizationHelper.Pluralize(_entityType.Name)
+				: name;
+
+			_queryGenerator = new SqlServerGenerator(name);
+		}
+
+		public EntityStore(string connectionString, IQueryGenerator generator = null) : this() {
+			_connectionString = ConnectionStringHelper.FindByName(connectionString);
+
+			_queryGenerator = generator;
+			_connectionString = ConnectionStringHelper.FindByName(connectionString);
+
+			if (_connectionString == null)
+				throw new ArgumentException("A connection string must be specified, or there must be at least one connection string set in your configuration file.");
+		}
+
+		public EntityStore(IDbConnection connection, string name = null)
+			: this() {
+			_connection = connection;
+			_useProvidedConnection = true;
+
+			name = String.IsNullOrEmpty(name)
+				? PluralizationHelper.Pluralize(_entityType.Name)
+				: name;
+
+			_queryGenerator = new SqlServerGenerator(name);
+		}
+
+		public EntityStore(IDbConnection connection, IQueryGenerator generator = null) : this() {
+			_connection = connection;
+			_useProvidedConnection = true;
+
+			_queryGenerator = generator;
 		}
 
 		#endregion
