@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Haberdasher.Tests.TestClasses
 {
-	public class SimpleClassSqlTable : SqlTable<SimpleClass, int>
+	public class SimpleClassEntityStore : EntityStore<SimpleClass, int>
 	{
-		public SimpleClassSqlTable() : base("SimpleClasses", "") { }
+		public SimpleClassEntityStore() : base("SimpleClasses", "") { }
 	}
 }
