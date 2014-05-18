@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Haberdasher.Support.Helpers;
 
 namespace Haberdasher
 {
@@ -20,8 +21,13 @@ namespace Haberdasher
 			foreach (var property in type.GetProperties())
 				Add(new CachedProperty(property));
 
-			if (Key == null)
-				throw new MissingPrimaryKeyException("Entity type does not define a primary key.");
+			if (Key != null) return;
+
+			Key = KeyHelper.FindKey(SelectFields);
+
+			if (Key != null) return;
+
+			throw new MissingPrimaryKeyException("Entity type does not define a primary key.");
 		}
 
 		public void Add(CachedProperty property) {
