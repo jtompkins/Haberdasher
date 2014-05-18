@@ -6,8 +6,6 @@ namespace Haberdasher.QueryGenerators
 {
 	public class SqlServerGenerator : IQueryGenerator
 	{
-		#region Constants
-
 		private const string SelectAllFormat = "select {0} from [{1}] order by {2}";
 		private const string SelectFormat = "select {0} from [{1}] where {2} = {3}";
 		private const string SelectManyFormat = "select {0} from [{1}] where {2} in {3}";
@@ -28,31 +26,23 @@ namespace Haberdasher.QueryGenerators
 
         public const string ParameterFormat = "@";
 
-		#endregion
-
 		private readonly string _table;
 
 		public SqlServerGenerator(string table) {
 			_table = table;
 		}
 
-		#region Private Methods
-
 		private static string BuildColumns(IEnumerable<CachedProperty> properties) {
-			var columns = "*";
+			if (!properties.Any()) return String.Empty;
 
-			var cachedProperties = properties as IList<CachedProperty> ?? properties.ToList();
+			var clauses = properties.Select(property => property.IsAliased
+															? String.Format(SelectParamFormat, property.Alias, property.Property)
+															: property.Property);
 
-			if (cachedProperties.Count > 0) {
-				var clauses = cachedProperties.Select(property => property.IsAliased ? String.Format(SelectParamFormat, property.Alias, property.Property) : property.Property);
-
-				columns = String.Join(", ", clauses);
-			}
+			var columns = String.Join(", ", clauses);
 
 			return columns;
 		}
-
-		#endregion
 
 		/// <summary>
 		/// Generates a complete SELECT statement with an ORDER BY clause that returns all rows in a SQL table, ordered by the given key property.
@@ -178,9 +168,12 @@ namespace Haberdasher.QueryGenerators
 		/// <example>TSQL: parameters should be prefixed with "@".</example>
 		/// <param name="param">The unformatted SQL parameter</param>
         public string FormatSqlParameter(string param) {
+			if (param.Substring(0, ParameterFormat.Length) == ParameterFormat)
+				param = RemoveSqlParameterFormatting(param);
+
 			return String.IsNullOrWhiteSpace(param)
 				? String.Empty 
-				: String.Format("{0}{1}", ParameterFormat, RemoveSqlParameterFormatting(param));
+				: String.Format("{0}{1}", ParameterFormat, param);
 		}
 
 		/// <summary>
@@ -188,7 +181,9 @@ namespace Haberdasher.QueryGenerators
 		/// </summary>
 		/// <param name="param">The formatted SQL parameter</param>
 		public string RemoveSqlParameterFormatting(string param) {
-			return param.Remove(0, ParameterFormat.Length);
+			return param.Length < ParameterFormat.Length 
+				? param 
+				: param.Remove(0, ParameterFormat.Length);
 		}
 	}
 }

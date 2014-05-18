@@ -101,7 +101,7 @@ namespace Haberdasher.Tests
 
 			[Fact]
 			public void CreatesWellFormedSelectAll() {
-				var properties = new List<CachedProperty>() {_idProperty, _nameProperty};
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty };
 
 				var sql = _queryGenerator.SelectAll(properties, _idProperty);
 				var expectedSql = "select Id, Name from [SimpleClasses] order by Id";
@@ -128,7 +128,7 @@ namespace Haberdasher.Tests
 			private readonly SqlServerGenerator _queryGenerator;
 
 			public NonIdentityKeyClassTests() {
-				var type = typeof (NonIdentityKeyClass);
+				var type = typeof(NonIdentityKeyClass);
 
 				_idProperty = new CachedProperty(type.GetProperty("Id"));
 
@@ -154,7 +154,7 @@ namespace Haberdasher.Tests
 			private readonly SqlServerGenerator _queryGenerator;
 
 			public NonScopeIdentityKeyClassTests() {
-				var type = typeof (NonScopeIdentityKeyClass);
+				var type = typeof(NonScopeIdentityKeyClass);
 
 				_idProperty = new CachedProperty(type.GetProperty("Id"));
 				_queryGenerator = new SqlServerGenerator("NonScopeIdentityKeyClasses");
@@ -182,7 +182,7 @@ namespace Haberdasher.Tests
 			private readonly SqlServerGenerator _queryGenerator;
 
 			public AliasedColumnsClassTests() {
-				var type = typeof (AliasedColumnsClass);
+				var type = typeof(AliasedColumnsClass);
 
 				_idProperty = new CachedProperty(type.GetProperty("Id"));
 				_nameProperty = new CachedProperty(type.GetProperty("Name"));
@@ -267,26 +267,26 @@ namespace Haberdasher.Tests
 				Assert.Equal(expectedSql, sql);
 			}
 
-            [Fact]
-            public void FormatSqlParamNameAddsIdentifier()
-            {
-                string paramName = _queryGenerator.FormatSqlParameter("id");
-                Assert.Equal("@id", paramName);
-            }
+			[Fact]
+			public void FormatSqlParamNameAddsIdentifier() {
+				var paramName = _queryGenerator.FormatSqlParameter("id");
 
-            [Fact]
-            public void FormatSqlParamNameRemovesAndAddsIdentifier()
-            {
-                string paramName = _queryGenerator.FormatSqlParameter(":id");
-                Assert.Equal("@id", paramName);
+				Assert.Equal("@id", paramName);
+			}
 
-                paramName = _queryGenerator.FormatSqlParameter("@id");
-                Assert.Equal("@id", paramName);
+			[Fact]
+			public void FormatSqlParamNameRemovesAndAddsIdentifier() {
+				var paramName = _queryGenerator.FormatSqlParameter("@id");
 
-                paramName = _queryGenerator.FormatSqlParameter("?id");
-                Assert.Equal("@id", paramName);
+				Assert.Equal("@id", paramName);
+			}
 
-            }
+			[Fact]
+			public void RemoveSqlParameterFormattingRemovesFormatting() {
+				var paramName = _queryGenerator.RemoveSqlParameterFormatting("@id");
+
+				Assert.Equal("id", paramName);
+			}
 		}
 	}
 }
