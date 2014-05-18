@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Haberdasher.Tests
 {
-	public class SqlServerSqlBuilderFixture
+	public class SqlServerGeneratorFixture
 	{
 		public class SimpleClassTests
 		{

@@ -5,7 +5,6 @@ namespace Haberdasher.Tests.TestClasses
 	public class NullableColumnsClass
 	{
 		[Key]
-		[Nullable]
 		public int? Id { get; set; }
 
 		[Nullable]

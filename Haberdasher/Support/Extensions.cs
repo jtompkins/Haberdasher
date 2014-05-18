@@ -52,6 +52,15 @@ namespace Haberdasher.Support
 			if (type == null) return false;
 			if (!type.IsValueType) return true; // ref-type
 			if (Nullable.GetUnderlyingType(type) != null) return true; // Nullable<T>
+
+			return false; // value-type
+		}
+
+		public static bool IsNullableValueType(this Type type) {
+			if (type == null) return false;
+			if (!type.IsValueType) return false; // ref-type
+			if (Nullable.GetUnderlyingType(type) != null) return true; // Nullable<T>
+
 			return false; // value-type
 		}
 

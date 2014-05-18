@@ -45,9 +45,11 @@ namespace Haberdasher
 
 			var nullableAttr = property.GetCustomAttribute<NullableAttribute>();
 
-			if (nullableAttr != null) {
-				if (!property.PropertyType.IsNullable())
-					throw new Exception("Non-Nullable properties may not be marked with the Nullable attribute: " + Property);
+			if (nullableAttr != null || property.PropertyType.IsNullableValueType()) {
+				if (property.PropertyType.IsValueType 
+					&& !property.PropertyType.IsNullableValueType() 
+					&& nullableAttr != null) 
+					throw new Exception("Non-Nullable value type properties may not be marked with the Nullable attribute: " + Property);
 
 				IsNullable = true;
 			}

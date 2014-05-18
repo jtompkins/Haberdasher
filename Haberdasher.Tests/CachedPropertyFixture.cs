@@ -215,7 +215,7 @@ namespace Haberdasher.Tests
 			public void ThrowsExceptionForNullableOnNonNullableProperty() {
 				var ex = Assert.Throws<Exception>(() => new CachedProperty(_type.GetProperty("NonNullableProperty")));
 
-				Assert.Equal("Non-Nullable properties may not be marked with the Nullable attribute: NonNullableProperty", ex.Message);
+				Assert.Equal("Non-Nullable value type properties may not be marked with the Nullable attribute: NonNullableProperty", ex.Message);
 			}
 		}
 
