@@ -7,7 +7,7 @@ using Haberdasher.Support;
 
 namespace Haberdasher.Contrib.Oracle.SqlBuilders
 {
-	public class OracleSqlBuilder : ISqlBuilder
+	public class OracleGenerator : ISqlGenerator
 	{
 		#region Constants
         // Oracle uses double quotes for literal table names 
@@ -38,7 +38,7 @@ namespace Haberdasher.Contrib.Oracle.SqlBuilders
         // name of the table
 		private readonly string _name;
 
-        public OracleSqlBuilder(string name)
+        public OracleGenerator(string name)
         {
 			_name = name;
 		}

@@ -56,10 +56,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Haberdasher.Contrib\Haberdasher.Contrib.csproj">
-      <Project>{5b7402f2-9cec-41d6-a6f8-7c1d05097ccf}</Project>
-      <Name>Haberdasher.Contrib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Haberdasher.Tests\Haberdasher.Tests.csproj">
       <Project>{0b291b44-1386-4656-a3ba-8df7f993f019}</Project>
       <Name>Haberdasher.Tests</Name>

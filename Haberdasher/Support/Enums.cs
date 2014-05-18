@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Haberdasher.Support
+﻿namespace Haberdasher.Support
 {
 	public enum IgnoreTypeEnum
 	{
@@ -13,5 +7,11 @@ namespace Haberdasher.Support
 		Update,
 		Writes,
 		All
+	}
+
+	public enum OrderByDirection
+	{
+		Ascending,
+		Descending
 	}
 }

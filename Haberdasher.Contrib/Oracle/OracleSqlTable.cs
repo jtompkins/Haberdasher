@@ -11,8 +11,8 @@ namespace Haberdasher.Contrib.Oracle
     /// <summary>
     /// the OracleHaberdashery is an abstract base class to retrieve data from an Oracle table using the Oracle Managed Provider by default
     /// </summary>
-    /// <typeparam name="TEntity">The type of the t entity.</typeparam>
-    /// <typeparam name="TKey">The type of the t key.</typeparam>
+    /// <typeparam table="TEntity">The type of the t entity.</typeparam>
+    /// <typeparam table="TKey">The type of the t key.</typeparam>
     public abstract class OracleSqlTable<TEntity, TKey> : SqlTable<TEntity, TKey> where TEntity : class, new()
     {
 
@@ -21,11 +21,11 @@ namespace Haberdasher.Contrib.Oracle
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SqlTable{TEntity,TKey}"/> class.
 		/// </summary>
-		/// <param name="connectionString">The connection string (not the configuration name).</param>
-		/// <param name="sqlBuilder">The tailor.</param>
+		/// <param table="connectionString">The connection string (not the configuration table).</param>
+		/// <param table="sqlGenerator">The tailor.</param>
 		/// <exception cref="System.ArgumentException">A connection string must be specified.</exception>
-		protected OracleSqlTable(string connectionString, ISqlBuilder sqlBuilder) {
-			_sqlBuilder = sqlBuilder;
+		protected OracleSqlTable(string connectionString, ISqlGenerator sqlGenerator) {
+			_sqlGenerator = sqlGenerator;
 
 			if (!String.IsNullOrEmpty(connectionString)) {
 				_connectionString = connectionString;
@@ -36,22 +36,22 @@ namespace Haberdasher.Contrib.Oracle
 		}
 
         protected OracleSqlTable(string name, string connectionStringConfigName = null)
-            : base(name, connectionStringConfigName, new OracleSqlBuilder(name))
+            : base(name, connectionStringConfigName, new OracleGenerator(name))
         {
 
         }
 
         #endregion
 
-        public OracleSqlBuilder SqlBuilder
+        public OracleGenerator SqlGenerator
         {
-            get { return _sqlBuilder as OracleSqlBuilder; }
+            get { return _sqlGenerator as OracleGenerator; }
         }
 
         /// <summary>
-        /// Gets or sets the name of the Oracle sequence to use when assigning the primary key 
+        /// Gets or sets the table of the Oracle sequence to use when assigning the primary key 
         /// </summary>
-        /// <value>The name of the sequence.</value>
+        /// <value>The table of the sequence.</value>
         /// <remarks>used only when identity is set to false [Key(false)]</remarks>
         public string SequenceName { get; set; }
 
@@ -71,7 +71,7 @@ namespace Haberdasher.Contrib.Oracle
         /// <summary>
         /// Inserts the specified entity into the Oracle DB using the configured method to determine the primary key.
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param table="entity">The entity.</param>
         /// <returns>`1.</returns>
         /// <exception cref="System.ArgumentException">Entity must not be null.</exception>
         public override TKey Insert(TEntity entity)
@@ -105,7 +105,7 @@ namespace Haberdasher.Contrib.Oracle
         /// <summary>
         /// Inserts a new record using the primary key value set in the database
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param table="entity">The entity.</param>
         /// <returns>TKey.</returns>
         protected TKey InsertWithIdentityKey(TEntity entity)
         {
@@ -121,12 +121,12 @@ namespace Haberdasher.Contrib.Oracle
             var parameters = BuildParameterList(_insertFields, entity);
 
             // add an output parameter for the id
-            var paramNameForIdentity = _sqlBuilder.FormatSqlParamName(_key.Name);
+            var paramNameForIdentity = _sqlGenerator.FormatSqlParameter(_key.Name);
             parameters.Add(name: paramNameForIdentity, dbType: DbType.Decimal, direction: ParameterDirection.Output);
 
             using (var connection = GetConnection())
             {
-                string sql = this.SqlBuilder.InsertWithIdentity(properties, _key);
+                string sql = this.SqlGenerator.InsertWithIdentity(properties, _key);
                 Debug.WriteLine(String.Format("InsertWithIdentityKey :: sql = {0}", sql));
 
                 connection.Execute(sql, parameters);
@@ -141,7 +141,7 @@ namespace Haberdasher.Contrib.Oracle
         /// <summary>
         /// Inserts a new record using a value supplied by the entity for the primary key value
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param table="entity">The entity.</param>
         /// <returns>TKey.</returns>
         /// <remarks>be sure the property is marked with Key(false)</remarks>
         protected TKey InsertWithNoIdentityKey(TEntity entity)
@@ -154,7 +154,7 @@ namespace Haberdasher.Contrib.Oracle
 
             using (var connection = GetConnection())
             {
-                string sql = _sqlBuilder.Insert(properties, _key);
+                string sql = _sqlGenerator.Insert(properties, _key);
                 Debug.WriteLine(String.Format("InsertWithNoIdentityKey :: sql = {0}", sql));
                 connection.Execute(sql, parameters);
 
@@ -167,7 +167,7 @@ namespace Haberdasher.Contrib.Oracle
         /// <summary>
         /// Sets the identifier value from the sequence.
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param table="entity">The entity.</param>
         /// <exception cref="System.ArgumentException">Entity must not be null.</exception>
         /// <exception cref="System.InvalidOperationException">the SequenceName must be set to use InsertWithSequence</exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2100:Review SQL queries for security vulnerabilities")]
@@ -187,7 +187,7 @@ namespace Haberdasher.Contrib.Oracle
 
                 // lookup the id from the sequence first
                 var cmd = connection.CreateCommand();
-                string sequenceSql = String.Format("select {0}.nextval from dual", this.SequenceName); // suppress CA2100 since sequence name is not from user
+                string sequenceSql = String.Format("select {0}.nextval from dual", this.SequenceName); // suppress CA2100 since sequence table is not from user
                 Debug.WriteLine(String.Format("InsertWithSequence :: sql = {0}", sequenceSql));
                 cmd.CommandText = sequenceSql;
 

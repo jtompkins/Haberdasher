@@ -2,6 +2,7 @@
 using System.Reflection;
 using Haberdasher.Attributes;
 using Haberdasher.Support;
+using Haberdasher.Support.ExpressionBuilders;
 
 namespace Haberdasher
 {

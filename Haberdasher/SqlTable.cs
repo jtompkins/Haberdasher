@@ -21,12 +21,10 @@ namespace Haberdasher
 		#region Properties
 
 		private readonly Type _entityType;
-		protected ISqlBuilder _sqlBuilder;
+		protected ISqlGenerator _sqlGenerator;
 		protected string _connectionString;
 		protected readonly IDbConnection _connection;
 		protected readonly bool _useProvidedConnection;
-
-		protected readonly IDictionary<TKey, TEntity> _entityCache;
 
 		protected CachedProperty _key {
 			get { return CachedTypes[_entityType].Key; }
@@ -52,9 +50,9 @@ namespace Haberdasher
 			CachedTypes = new Dictionary<Type, CachedType>();
 		}
 
-		protected SqlTable(string name, string connectionString = null, ISqlBuilder sqlBuilder = null)
+		protected SqlTable(string name, string connectionString = null, ISqlGenerator sqlGenerator = null)
 			: this() {
-			_sqlBuilder = sqlBuilder ?? new SqlServerSqlBuilder(name);
+			_sqlGenerator = sqlGenerator ?? new SqlServerGenerator(name);
 
 			if (!String.IsNullOrEmpty(connectionString)) {
 				_connectionString = ConfigurationManager.ConnectionStrings[connectionString].ConnectionString;
@@ -67,19 +65,18 @@ namespace Haberdasher
 			}
 		}
 
-		protected SqlTable(string name, IDbConnection connection, ISqlBuilder sqlBuilder = null)
+		protected SqlTable(string name, IDbConnection connection, ISqlGenerator sqlGenerator = null)
 			: this() {
 			if (connection == null)
 				throw new ArgumentException("A valid IDbConnection must be given.");
 
 			_connection = connection;
 			_useProvidedConnection = true;
-			_sqlBuilder = sqlBuilder ?? new SqlServerSqlBuilder(name);
+			_sqlGenerator = sqlGenerator ?? new SqlServerGenerator(name);
 		}
 
 		protected SqlTable() {
 			_entityType = typeof(TEntity);
-			_entityCache = new Dictionary<TKey, TEntity>();
 
 			if (!CachedTypes.ContainsKey(_entityType))
 				CachedTypes.Add(_entityType, new CachedType(_entityType));
@@ -137,8 +134,8 @@ namespace Haberdasher
 			var connection = GetConnection();
 
 			try {
-				var keyParamName = _sqlBuilder.FormatSqlParamName("id");
-				var entity = connection.Query<TEntity>(_sqlBuilder.Select(_selectFields, _key, keyParamName), parameters).FirstOrDefault();
+				var keyParamName = _sqlGenerator.FormatSqlParameter("id");
+				var entity = connection.Query<TEntity>(_sqlGenerator.Select(_selectFields, _key, keyParamName), parameters).FirstOrDefault();
 
 				return entity;
 			}
@@ -162,8 +159,8 @@ namespace Haberdasher
 			var connection = GetConnection();
 
 			try {
-				var keyParamName = _sqlBuilder.FormatSqlParamName("keys");
-				entities = connection.Query<TEntity>(_sqlBuilder.SelectMany(_selectFields, _key, keyParamName), parameters).ToList();
+				var keyParamName = _sqlGenerator.FormatSqlParameter("keys");
+				entities = connection.Query<TEntity>(_sqlGenerator.SelectMany(_selectFields, _key, keyParamName), parameters).ToList();
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -177,7 +174,7 @@ namespace Haberdasher
 		}
 
 		public IEnumerable<TEntity> Find(string whereClause, object param = null) {
-			var sql = _sqlBuilder.Find(_selectFields, whereClause);
+			var sql = _sqlGenerator.Find(_selectFields, whereClause);
 
 			IEnumerable<TEntity> entities;
 
@@ -203,7 +200,7 @@ namespace Haberdasher
 		}
 
 		public virtual IEnumerable<TEntity> All() {
-			var query = _sqlBuilder.All(_selectFields, _key);
+			var query = _sqlGenerator.SelectAll(_selectFields, _key);
 
 			IEnumerable<TEntity> result;
 
@@ -232,7 +229,7 @@ namespace Haberdasher
 			var connection = GetConnection();
 
 			try {
-				var sql = _sqlBuilder.Insert(properties, _key);
+				var sql = _sqlGenerator.Insert(properties, _key);
 				identity = connection.Query<decimal>(sql, parameters).Single();
 			}
 			finally {
@@ -266,8 +263,8 @@ namespace Haberdasher
 			var connection = GetConnection();
 
 			try {
-				var keyParamName = _sqlBuilder.FormatSqlParamName(_key.Property);
-				result = connection.Execute(_sqlBuilder.Update(properties, _key, keyParamName), parameters);
+				var keyParamName = _sqlGenerator.FormatSqlParameter(_key.Property);
+				result = connection.Execute(_sqlGenerator.Update(properties, _key, keyParamName), parameters);
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -294,8 +291,8 @@ namespace Haberdasher
 			var connection = GetConnection();
 
 			try {
-				var keyParamName = _sqlBuilder.FormatSqlParamName(_key.Property);
-				result = connection.Execute(_sqlBuilder.Delete(_key, keyParamName), parameters);
+				var keyParamName = _sqlGenerator.FormatSqlParameter(_key.Property);
+				result = connection.Execute(_sqlGenerator.Delete(_key, keyParamName), parameters);
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -318,8 +315,8 @@ namespace Haberdasher
 			var connection = GetConnection();
 
 			try {
-				var keyParamName = _sqlBuilder.FormatSqlParamName(_key.Property);
-				result = connection.Execute(_sqlBuilder.DeleteMany(_key, keyParamName), parameters);
+				var keyParamName = _sqlGenerator.FormatSqlParameter(_key.Property);
+				result = connection.Execute(_sqlGenerator.DeleteMany(_key, keyParamName), parameters);
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -349,7 +346,7 @@ namespace Haberdasher
 				if (property == null || String.IsNullOrEmpty(property.Name))
 					continue;
 
-				var key = _sqlBuilder.FormatSqlParamName(property.Name);
+				var key = _sqlGenerator.FormatSqlParameter(property.Name);
 
 				if (!propertyList.ContainsKey(key))
 					propertyList.Add(key, property);
