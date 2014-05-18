@@ -150,6 +150,9 @@ namespace Haberdasher
 
 		#region CRUD Methods
 
+		/// <summary>
+		/// Gets all entities from the database.
+		/// </summary>
 		public IEnumerable<TEntity> Get() {
 			var query = _queryGenerator.SelectAll(SelectFields, Key);
 
@@ -168,6 +171,10 @@ namespace Haberdasher
 			return result;
 		}
 
+		/// <summary>
+		/// Gets an entity from the database by key.
+		/// </summary>
+		/// <param name="key">The primary key of the entity</param>
 		public TEntity Get(TKey key) {
 			var parameters = new DynamicParameters();
 
@@ -187,6 +194,10 @@ namespace Haberdasher
 			}
 		}
 
+		/// <summary>
+		/// Gets one or more entities from the database by key.
+		/// </summary>
+		/// <param name="keys">An enumerable of key values</param>
 		public IEnumerable<TEntity> Get(IEnumerable<TKey> keys) {
 			if (keys == null || !keys.Any())
 				throw new ArgumentException("Keys must not be null or an empty enumerable.");
@@ -215,6 +226,11 @@ namespace Haberdasher
 			return results;
 		}
 
+		/// <summary>
+		/// Gets entities from the database, filtered using a WHERE clause.
+		/// </summary>
+		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
+		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public IEnumerable<TEntity> Find(string whereClause, object param = null) {
 			var sql = _queryGenerator.FindOne(SelectFields, whereClause);
 
@@ -233,6 +249,11 @@ namespace Haberdasher
 			return entities ?? new List<TEntity>();
 		}
 
+		/// <summary>
+		/// Gets a single entity from the database, filtered using a WHERE clause.
+		/// </summary>
+		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
+		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public TEntity FindOne(string whereClause, object param = null) {
 			var sql = _queryGenerator.Find(SelectFields, whereClause);
 			var connection = GetConnection();
@@ -248,6 +269,11 @@ namespace Haberdasher
 			}	
 		}
 
+		/// <summary>
+		/// Inserts an entity into the database.
+		/// </summary>
+		/// <param name="entity">The entity to be inserted</param>
+		/// <returns>The primary key of the inserted entity</returns>
 		public TKey Insert(TEntity entity) {
 			if (entity == null)
 				throw new ArgumentException("Entity must not be null.");
@@ -271,6 +297,11 @@ namespace Haberdasher
 			return Key.IsIdentity ? (TKey)Convert.ChangeType(identity, typeof(TKey)) : (TKey)Key.Getter(entity);
 		}
 
+		/// <summary>
+		/// Inserts multiple entities into the database.
+		/// </summary>
+		/// <param name="entities">The entities to be inserted</param>
+		/// <returns>The primary key of the inserted entity</returns>
 		public IEnumerable<TKey> Insert(IEnumerable<TEntity> entities) {
 			if (entities == null || !entities.Any())
 				throw new ArgumentException("Entities must not be null or an empty enumerable.");
@@ -278,6 +309,11 @@ namespace Haberdasher
 			return entities.Select(Insert).ToList();
 		}
 
+		/// <summary>
+		/// Updates an entity in the database.
+		/// </summary>
+		/// <param name="entity">The entity to be updated</param>
+		/// <returns>The number of updated records</returns>
 		public int Update(TEntity entity) {
 			if (entity == null)
 				throw new ArgumentException("Entity must not be null.");
@@ -305,6 +341,11 @@ namespace Haberdasher
 			return result;
 		}
 
+		/// <summary>
+		/// Updates multiple entities in the database.
+		/// </summary>
+		/// <param name="entities">The entities to be updated</param>
+		/// <returns>The number of updated records</returns>
 		public int Update(IEnumerable<TEntity> entities) {
 			if (entities == null || !entities.Any())
 				throw new ArgumentException("Entities must not be null or an empty enumerable.");
@@ -312,10 +353,18 @@ namespace Haberdasher
 			return entities.Sum(entity => Update(entity));
 		}
 
+		/// <summary>
+		/// Deletes all rows in the database table.
+		/// </summary>
 		public void Delete() {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Deletes a row in the database table by key.
+		/// </summary>
+		/// <param name="key">The key of the row to be deleted</param>
+		/// <returns>The number of deleted rows</returns>
 		public int Delete(TKey key) {
 			var parameters = new DynamicParameters();
 
@@ -337,6 +386,11 @@ namespace Haberdasher
 			return result;
 		}
 
+		/// <summary>
+		/// Deletes multiple rows in the database.
+		/// </summary>
+		/// <param name="keys">The keys of the rows to be deleted</param>
+		/// <returns>The number of deleted rows</returns>
 		public int Delete(IEnumerable<TKey> keys) {
 			if (keys == null || !keys.Any())
 				throw new ArgumentException("Keys must not be null or an empty enumerable.");
@@ -365,50 +419,104 @@ namespace Haberdasher
 
 		#region Async CRUD Methods
 
+		/// <summary>
+		/// Asynchronously Gets all entities from the database.
+		/// </summary>
 		public Task<IEnumerable<TEntity>> GetAsync() {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously gets an entity from the database by key.
+		/// </summary>
+		/// <param name="key">The primary key of the entity</param>
 		public Task<TEntity> GetAsync(TKey key) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously gets one or more entities from the database by key.
+		/// </summary>
+		/// <param name="keys">An enumerable of key values</param>
 		public Task<IEnumerable<TEntity>> GetAsync(IEnumerable<TKey> keys) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously gets entities from the database, filtered using a WHERE clause.
+		/// </summary>
+		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
+		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public Task<IEnumerable<TEntity>> FindAsync(string whereClause, object param = null) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously gets a single entity from the database, filtered using a WHERE clause.
+		/// </summary>
+		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
+		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public Task<TEntity> FindOneAsync(string whereClause, object param = null) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously inserts an entity into the database.
+		/// </summary>
+		/// <param name="entity">The entity to be inserted</param>
+		/// <returns>The primary key of the inserted entity</returns>
 		public Task<TKey> InsertAsync(TEntity entity) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously inserts multiple entities into the database.
+		/// </summary>
+		/// <param name="entities">The entities to be inserted</param>
+		/// <returns>The primary key of the inserted entity</returns>
 		public Task<IEnumerable<TKey>> InsertAsync(IEnumerable<TEntity> entities) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously updates an entity in the database.
+		/// </summary>
+		/// <param name="entity">The entity to be updated</param>
+		/// <returns>The number of updated records</returns>
 		public Task<int> UpdateAsync(TEntity entity) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously updates multiple entities in the database.
+		/// </summary>
+		/// <param name="entities">The entities to be updated</param>
+		/// <returns>The number of updated records</returns>
 		public Task<int> UpdateAsync(IEnumerable<TEntity> entities) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously deletes all rows in the database table.
+		/// </summary>
 		public Task DeleteAsync() {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously deletes a row in the database table by key.
+		/// </summary>
+		/// <param name="key">The key of the row to be deleted</param>
+		/// <returns>The number of deleted rows</returns>
 		public Task<int> DeleteAsync(TKey key) {
 			throw new NotImplementedException();
 		}
 
+		/// <summary>
+		/// Asynchronously deletes multiple rows in the database.
+		/// </summary>
+		/// <param name="keys">The keys of the rows to be deleted</param>
+		/// <returns>The number of deleted rows</returns>
 		public Task<int> DeleteAsync(IEnumerable<TKey> keys) {
 			throw new NotImplementedException();
 		}
