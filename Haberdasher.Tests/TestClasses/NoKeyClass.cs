@@ -8,6 +8,6 @@ namespace Haberdasher.Tests.TestClasses
 {
 	public class NoKeyClass
 	{
-		public int Id { get; set; }
+		public int Name { get; set; }
 	}
 }
