@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Haberdasher.Support;
 
-namespace Haberdasher.SqlBuilders
+namespace Haberdasher.QueryGenerators
 {
-	public interface ISqlGenerator
+	public interface IQueryGenerator
 	{
 		/// <summary>
 		/// Generates a complete SELECT statement with an ORDER BY clause that returns all rows in a SQL table, ordered by the given key property.
