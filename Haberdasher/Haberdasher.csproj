@@ -53,6 +53,7 @@
     <Compile Include="CachedProperty.cs" />
     <Compile Include="CachedType.cs" />
     <Compile Include="Contracts\IEntityStore.cs" />
+    <Compile Include="Contracts\IQueryGenerator.cs" />
     <Compile Include="EntityStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Support\ExpressionBuilders\ComparerBuilder.cs" />
@@ -62,7 +63,6 @@
     <Compile Include="Support\ExpressionBuilders\GetterBuilder.cs" />
     <Compile Include="Support\Helpers\KeyHelper.cs" />
     <Compile Include="Support\ExpressionBuilders\SetterBuilder.cs" />
-    <Compile Include="QueryGenerators\IQueryGenerator.cs" />
     <Compile Include="QueryGenerators\SqlServerGenerator.cs" />
     <Compile Include="Support\Helpers\PluralizationHelper.cs" />
   </ItemGroup>
