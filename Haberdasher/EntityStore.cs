@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 
 using Dapper;
@@ -291,10 +292,7 @@ namespace Haberdasher
 		/// <param name="entities">The entities to be inserted</param>
 		/// <returns>The primary key of the inserted entity</returns>
 		public IEnumerable<TKey> Insert(IEnumerable<TEntity> entities) {
-			if (entities == null || !entities.Any())
-				throw new ArgumentException("Entities must not be null or an empty enumerable.");
-
-			return entities.Select(Insert).ToList();
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -335,17 +333,28 @@ namespace Haberdasher
 		/// <param name="entities">The entities to be updated</param>
 		/// <returns>The number of updated records</returns>
 		public int Update(IEnumerable<TEntity> entities) {
-			if (entities == null || !entities.Any())
-				throw new ArgumentException("Entities must not be null or an empty enumerable.");
-
-			return entities.Sum(entity => Update(entity));
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
 		/// Deletes all rows in the database table.
 		/// </summary>
-		public void Delete() {
-			throw new NotImplementedException();
+		public int Delete() {
+			var query = _queryGenerator.DeleteAll();
+
+			int result;
+
+			var connection = GetConnection();
+
+			try {
+				result = connection.Execute(query);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
+			}
+
+			return result;
 		}
 
 		/// <summary>

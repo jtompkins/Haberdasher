@@ -78,7 +78,7 @@ namespace Haberdasher.Contracts
 		/// <summary>
 		/// Deletes all rows in the database table.
 		/// </summary>
-		void Delete();
+		int Delete();
 
 		/// <summary>
 		/// Deletes a row in the database table by key.
