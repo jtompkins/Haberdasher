@@ -27,12 +27,6 @@ namespace Haberdasher.QueryGenerators
 
         public const string ParameterFormat = "@";
 
-		private readonly string _table;
-
-		public SqlServerGenerator(string table) {
-			_table = table;
-		}
-
 		private static string BuildColumns(IEnumerable<CachedProperty> properties) {
 			if (!properties.Any()) return String.Empty;
 
@@ -48,56 +42,62 @@ namespace Haberdasher.QueryGenerators
 		/// <summary>
 		/// Generates a complete SELECT statement with an ORDER BY clause that returns all rows in a SQL table, ordered by the given key property.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="key">The property that represents the table's primary key</param>
-		public string SelectAll(IEnumerable<CachedProperty> properties, CachedProperty key) {
-			return String.Format(SelectAllFormat, BuildColumns(properties), _table, key.Name);
+		public string SelectAll(string table, IEnumerable<CachedProperty> properties, CachedProperty key) {
+			return String.Format(SelectAllFormat, BuildColumns(properties), table, key.Name);
 		}
 
 		/// <summary>
 		/// Generates a complete SELECT statement with a WHERE clause that selects a single row based on the given key property.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="key">The property that represents the table's primary key</param>
 		/// <param name="value">The value which will be passed to the database</param>
-		public string Select(IEnumerable<CachedProperty> properties, CachedProperty key, string value) {
-			return String.Format(SelectFormat, BuildColumns(properties), _table, key.Name, value);
+		public string Select(string table, IEnumerable<CachedProperty> properties, CachedProperty key, string value) {
+			return String.Format(SelectFormat, BuildColumns(properties), table, key.Name, value);
 		}
 
 		/// <summary>
 		/// Generates a SELECT statement with a WHERE IN clause which selects multiple rows based on one or more primary key values. 
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="key">The property that represents the table's primary key</param>
 		/// <param name="values">The primary key values that will be passed to the database</param>
-		public string SelectMany(IEnumerable<CachedProperty> properties, CachedProperty key, string values) {
-			return String.Format(SelectManyFormat, BuildColumns(properties), _table, key.Name, values);
+		public string SelectMany(string table, IEnumerable<CachedProperty> properties, CachedProperty key, string values) {
+			return String.Format(SelectManyFormat, BuildColumns(properties), table, key.Name, values);
 		}
 
 		/// <summary>
 		/// Generates a SELECT statement with an arbitrary WHERE clause.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="whereClause">A WHERE clause which will be passed to the database</param>
-		public string Find(IEnumerable<CachedProperty> properties, string whereClause) {
-			return String.Format(FindFormat, BuildColumns(properties), _table, whereClause);
+		public string Find(string table, IEnumerable<CachedProperty> properties, string whereClause) {
+			return String.Format(FindFormat, BuildColumns(properties), table, whereClause);
 		}
 
 		/// <summary>
 		/// Generates a SELECT statement with an arbitrary WHERE clause that only returns one row
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="whereClause">A WHERE clause which will be passed to the database</param>
-		public string FindOne(IEnumerable<CachedProperty> properties, string whereClause) {
-			return String.Format(FindOneFormat, BuildColumns(properties), _table, whereClause);
+		public string FindOne(string table, IEnumerable<CachedProperty> properties, string whereClause) {
+			return String.Format(FindOneFormat, BuildColumns(properties), table, whereClause);
 		}
 
 		/// <summary>
 		/// Generates an INSERT statement using the passed-in properties.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
-		public string Insert(IDictionary<string, CachedProperty> properties, CachedProperty key) {
+		public string Insert(string table, IDictionary<string, CachedProperty> properties, CachedProperty key) {
 			var fields = new List<string>();
 			var valueParams = new List<string>();
 
@@ -111,56 +111,61 @@ namespace Haberdasher.QueryGenerators
 			if (key.IsIdentity)
 				insertOptions = key.UseScopeIdentity ? "select SCOPE_IDENTITY()" : "select @@IDENTITY";
 
-			return String.Format(InsertFormat, _table, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
+			return String.Format(InsertFormat, table, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
 		}
 
 		/// <summary>
 		/// Generates an UPDATE statement for a single key using the passed-in properties.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="value">The key to be updated</param>
-		public string Update(IDictionary<string, CachedProperty> properties, CachedProperty key, string value) {
+		public string Update(string table, IDictionary<string, CachedProperty> properties, CachedProperty key, string value) {
 			var clauses = properties.Select(kvp => String.Format(UpdateParamFormat, kvp.Value.Name, kvp.Key));
 
-			return String.Format(UpdateFormat, _table, String.Join(", ", clauses), key.Name, value);
+			return String.Format(UpdateFormat, table, String.Join(", ", clauses), key.Name, value);
 		}
 
 		/// <summary>
 		/// Generates an UPDATE statement for one or more keys using the passed-in properties.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="values">The keys to be updated</param>
-		public string UpdateMany(IDictionary<string, CachedProperty> properties, CachedProperty key, string values) {
+		public string UpdateMany(string table, IDictionary<string, CachedProperty> properties, CachedProperty key, string values) {
 			var clauses = properties.Select(kvp => String.Format(UpdateParamFormat, kvp.Value.Name, kvp.Key));
 
-			return String.Format(UpdateManyFormat, _table, String.Join(", ", clauses), key.Name, values);
+			return String.Format(UpdateManyFormat, table, String.Join(", ", clauses), key.Name, values);
 		}
 
 		/// <summary>
 		/// Generates a DELETE statement for all rows in a table.
 		/// </summary>
-		public string DeleteAll() {
-			return String.Format(DeleteAllFormat, _table);
+		/// <param name="table">The name of the table</param>
+		public string DeleteAll(string table) {
+			return String.Format(DeleteAllFormat, table);
 		}
 
 		/// <summary>
 		/// Generates a DELETE statement for a single key.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="value">The key to be deleted</param>
-		public string Delete(CachedProperty key, string value) {
-			return String.Format(DeleteFormat, _table, key.Name, value);
+		public string Delete(string table, CachedProperty key, string value) {
+			return String.Format(DeleteFormat, table, key.Name, value);
 		}
 
 		/// <summary>
 		/// Generates a DELETE statement for one or more keys.
 		/// </summary>
+		/// <param name="table">The name of the table</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="values">The keys to be deleted</param>
-		public string DeleteMany(CachedProperty key, string values) {
-			return String.Format(DeleteManyFormat, _table, key.Name, values);
+		public string DeleteMany(string table, CachedProperty key, string values) {
+			return String.Format(DeleteManyFormat, table, key.Name, values);
 		}
 
 		/// <summary>

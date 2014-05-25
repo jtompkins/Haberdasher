@@ -25,6 +25,10 @@ namespace Haberdasher
 		private readonly IDbConnection _connection;
 		private readonly bool _useProvidedConnection;
 
+		private string Table {
+			get { return CachedTypes[_entityType].Name; }
+		}
+
 		private CachedProperty Key {
 			get { return CachedTypes[_entityType].Key; }
 		}
@@ -54,7 +58,7 @@ namespace Haberdasher
 				CachedTypes.Add(_entityType, new CachedType(_entityType));
 
 			_connectionString = ConnectionStringHelper.FindFirst();
-			_queryGenerator = new SqlServerGenerator(NameHelper.GetEntityTableName<TEntity>());
+			_queryGenerator = new SqlServerGenerator();
 		}
 
 		public EntityStore(IQueryGenerator generator) : this() {
@@ -143,7 +147,7 @@ namespace Haberdasher
 		/// Gets all entities from the database.
 		/// </summary>
 		public IEnumerable<TEntity> Get() {
-			var query = _queryGenerator.SelectAll(SelectFields, Key);
+			var query = _queryGenerator.SelectAll(Table, SelectFields, Key);
 
 			IEnumerable<TEntity> result;
 
@@ -173,7 +177,7 @@ namespace Haberdasher
 
 			try {
 				var keyParamName = _queryGenerator.FormatSqlParameter("id");
-				var entity = connection.Query<TEntity>(_queryGenerator.Select(SelectFields, Key, keyParamName), parameters).FirstOrDefault();
+				var entity = connection.Query<TEntity>(_queryGenerator.Select(Table, SelectFields, Key, keyParamName), parameters).FirstOrDefault();
 
 				return entity;
 			}
@@ -202,7 +206,7 @@ namespace Haberdasher
 
 			try {
 				var keyParamName = _queryGenerator.FormatSqlParameter("keys");
-				entities = connection.Query<TEntity>(_queryGenerator.SelectMany(SelectFields, Key, keyParamName), parameters).ToList();
+				entities = connection.Query<TEntity>(_queryGenerator.SelectMany(Table, SelectFields, Key, keyParamName), parameters).ToList();
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -221,7 +225,7 @@ namespace Haberdasher
 		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
 		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public IEnumerable<TEntity> Find(string whereClause, object param = null) {
-			var sql = _queryGenerator.FindOne(SelectFields, whereClause);
+			var sql = _queryGenerator.FindOne(Table, SelectFields, whereClause);
 
 			IEnumerable<TEntity> entities;
 
@@ -244,7 +248,7 @@ namespace Haberdasher
 		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
 		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public TEntity FindOne(string whereClause, object param = null) {
-			var sql = _queryGenerator.Find(SelectFields, whereClause);
+			var sql = _queryGenerator.Find(Table, SelectFields, whereClause);
 			var connection = GetConnection();
 
 			try {
@@ -275,7 +279,7 @@ namespace Haberdasher
 			var connection = GetConnection();
 
 			try {
-				var sql = _queryGenerator.Insert(properties, Key);
+				var sql = _queryGenerator.Insert(Table, properties, Key);
 				identity = connection.Query<decimal>(sql, parameters).Single();
 			}
 			finally {
@@ -317,7 +321,7 @@ namespace Haberdasher
 
 			try {
 				var keyParamName = _queryGenerator.FormatSqlParameter(Key.Property);
-				result = connection.Execute(_queryGenerator.Update(properties, Key, keyParamName), parameters);
+				result = connection.Execute(_queryGenerator.Update(Table, properties, Key, keyParamName), parameters);
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -340,7 +344,7 @@ namespace Haberdasher
 		/// Deletes all rows in the database table.
 		/// </summary>
 		public int Delete() {
-			var query = _queryGenerator.DeleteAll();
+			var query = _queryGenerator.DeleteAll(Table);
 
 			int result;
 
@@ -373,7 +377,7 @@ namespace Haberdasher
 
 			try {
 				var keyParamName = _queryGenerator.FormatSqlParameter(Key.Property);
-				result = connection.Execute(_queryGenerator.Delete(Key, keyParamName), parameters);
+				result = connection.Execute(_queryGenerator.Delete(Table, Key, keyParamName), parameters);
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -402,7 +406,7 @@ namespace Haberdasher
 
 			try {
 				var keyParamName = _queryGenerator.FormatSqlParameter(Key.Property);
-				result = connection.Execute(_queryGenerator.DeleteMany(Key, keyParamName), parameters);
+				result = connection.Execute(_queryGenerator.DeleteMany(Table, Key, keyParamName), parameters);
 			}
 			finally {
 				if (!_useProvidedConnection)
