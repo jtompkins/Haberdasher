@@ -1,29 +1,45 @@
 ﻿using System.Linq;
-using Haberdasher.Contracts;
-using Haberdasher.Tests.TestClasses;
+using Haberdasher.Attributes;
 using Xunit;
 
 namespace Haberdasher.Tests
 {
-	public class HaberdasheryFixture
+	public class EntityStoreFixture
 	{
+		private class TestClass
+		{
+			public int Id { get; set; }
+			public string Name { get; set; }
+		}
+
+		private class AliasedColumnsClass
+		{
+			public int Id { get; set; }
+
+			[Alias("ADifferentName")]
+			public string Name { get; set; }
+
+			[Alias(null)]
+			public string Description { get; set; }
+		}
+
 		private readonly CachedType _simpleType;
 		private readonly CachedType _aliasedType;
 
-		private readonly EntityStore<SimpleClass, int> _simpleEntityStore;
+		private readonly EntityStore<TestClass, int> _simpleEntityStore;
 		private readonly EntityStore<AliasedColumnsClass, int> _aliasedEntityStore;
 
-		public HaberdasheryFixture() {
-			_simpleType = new CachedType(typeof(SimpleClass));
+		public EntityStoreFixture() {
+			_simpleType = new CachedType(typeof(TestClass));
 			_aliasedType = new CachedType(typeof(AliasedColumnsClass));
 
-			_simpleEntityStore = new EntityStore<SimpleClass, int>();
+			_simpleEntityStore = new EntityStore<TestClass, int>();
 			_aliasedEntityStore = new EntityStore<AliasedColumnsClass, int>();
 		}
 
 		[Fact]
 		public void BuildsSimpleParameterListCorrectly() {
-			var simple = new SimpleClass {Id = 1, Name = "Simple Class"};
+			var simple = new TestClass { Id = 1, Name = "Simple Class" };
 
 			var parameters = _simpleEntityStore.BuildParameterList(_simpleType.SelectFields, simple);
 

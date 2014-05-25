@@ -62,7 +62,6 @@
     <Compile Include="Support\Enums.cs" />
     <Compile Include="Support\Extensions.cs" />
     <Compile Include="Support\ExpressionBuilders\GetterBuilder.cs" />
-    <Compile Include="Support\Helpers\KeyHelper.cs" />
     <Compile Include="Support\ExpressionBuilders\SetterBuilder.cs" />
     <Compile Include="QueryGenerators\SqlServerGenerator.cs" />
     <Compile Include="Support\Helpers\NameHelper.cs" />

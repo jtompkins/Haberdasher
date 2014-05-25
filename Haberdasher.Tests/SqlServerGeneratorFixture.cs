@@ -1,23 +1,46 @@
 ﻿using System.Collections.Generic;
+using Haberdasher.Attributes;
 using Haberdasher.QueryGenerators;
-using Haberdasher.Tests.TestClasses;
 using Xunit;
 
 namespace Haberdasher.Tests
 {
 	public class SqlServerGeneratorFixture
 	{
-		public class SimpleClassTests
+		private class TestClass
 		{
-			private const string Table = "SimpleClasses";
+			public int Id { get; set; }
+			public string Name { get; set; }
+		}
+
+		private class NonIdentityKeyClass
+		{
+			[Key(false)]
+			public int Id { get; set; }
+		}
+
+		private class AliasedColumnsClass
+		{
+			public int Id { get; set; }
+
+			[Alias("ADifferentName")]
+			public string Name { get; set; }
+
+			[Alias(null)]
+			public string Description { get; set; }
+		}
+
+		public class TestClassTests
+		{
+			private const string Table = "TestClasses";
 
 			private readonly CachedProperty _idProperty;
 			private readonly CachedProperty _nameProperty;
 
 			private readonly SqlServerGenerator _queryGenerator;
 
-			public SimpleClassTests() {
-				var simpleClassType = typeof(SimpleClass);
+			public TestClassTests() {
+				var simpleClassType = typeof(TestClass);
 
 				_idProperty = new CachedProperty(simpleClassType.GetProperty("Id"));
 				_nameProperty = new CachedProperty(simpleClassType.GetProperty("Name"));
@@ -28,7 +51,7 @@ namespace Haberdasher.Tests
 			[Fact]
 			public void CreatesWellFormedSelect() {
 				var sql = _queryGenerator.Select(Table, new List<CachedProperty>() { _idProperty, _nameProperty }, _idProperty, "@id");
-				var expectedSql = "select Id, Name from [SimpleClasses] where Id = @id";
+				var expectedSql = "select Id, Name from [TestClasses] where Id = @id";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -36,7 +59,7 @@ namespace Haberdasher.Tests
 			[Fact]
 			public void CreatesWellFormedSelectMany() {
 				var sql = _queryGenerator.SelectMany(Table, new List<CachedProperty>() { _idProperty, _nameProperty }, _idProperty, "@ids");
-				var expectedSql = "select Id, Name from [SimpleClasses] where Id in @ids";
+				var expectedSql = "select Id, Name from [TestClasses] where Id in @ids";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -48,7 +71,19 @@ namespace Haberdasher.Tests
 				properties.Add("@name", _nameProperty);
 
 				var sql = _queryGenerator.Insert(Table, properties, _idProperty);
-				var expectedSql = "set nocount on insert into [SimpleClasses] (Name) values (@name) select SCOPE_IDENTITY()";
+				var expectedSql = "insert into [TestClasses] (Name) values (@name)";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedInsertWithIdentity() {
+				var properties = new Dictionary<string, CachedProperty>();
+
+				properties.Add("@name", _nameProperty);
+
+				var sql = _queryGenerator.InsertWithIdentity(Table, properties, _idProperty);
+				var expectedSql = "set nocount on insert into [TestClasses] (Name) values (@name) select SCOPE_IDENTITY()";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -60,7 +95,7 @@ namespace Haberdasher.Tests
 				properties.Add("@name", _nameProperty);
 
 				var sql = _queryGenerator.Update(Table, properties, _idProperty, "@id");
-				var expectedSql = "update [SimpleClasses] set Name = @name where Id = @id";
+				var expectedSql = "update [TestClasses] set Name = @name where Id = @id";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -72,7 +107,7 @@ namespace Haberdasher.Tests
 				properties.Add("@name", _nameProperty);
 
 				var sql = _queryGenerator.UpdateMany(Table, properties, _idProperty, "@ids");
-				var expectedSql = "update [SimpleClasses] set Name = @name where Id in @ids";
+				var expectedSql = "update [TestClasses] set Name = @name where Id in @ids";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -80,7 +115,7 @@ namespace Haberdasher.Tests
 			[Fact]
 			public void CreatesWellFormedDeleteAll() {
 				var sql = _queryGenerator.DeleteAll(Table);
-				var expectedSql = "truncate table [SimpleClasses]";
+				var expectedSql = "truncate table [TestClasses]";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -88,7 +123,7 @@ namespace Haberdasher.Tests
 			[Fact]
 			public void CreatesWellFormedDelete() {
 				var sql = _queryGenerator.Delete(Table, _idProperty, "@id");
-				var expectedSql = "delete from [SimpleClasses] where Id = @id";
+				var expectedSql = "delete from [TestClasses] where Id = @id";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -96,7 +131,7 @@ namespace Haberdasher.Tests
 			[Fact]
 			public void CreatesWellFormedDeleteMany() {
 				var sql = _queryGenerator.DeleteMany(Table, _idProperty, "@ids");
-				var expectedSql = "delete from [SimpleClasses] where Id in @ids";
+				var expectedSql = "delete from [TestClasses] where Id in @ids";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -106,7 +141,7 @@ namespace Haberdasher.Tests
 				var properties = new List<CachedProperty>() { _idProperty, _nameProperty };
 
 				var sql = _queryGenerator.SelectAll(Table, properties, _idProperty);
-				var expectedSql = "select Id, Name from [SimpleClasses] order by Id";
+				var expectedSql = "select Id, Name from [TestClasses] order by Id";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -117,7 +152,18 @@ namespace Haberdasher.Tests
 				var where = "Name like '%test%'";
 
 				var sql = _queryGenerator.Find(Table, properties, where);
-				var expectedSql = "select Id, Name from [SimpleClasses] where " + where;
+				var expectedSql = "select Id, Name from [TestClasses] where " + where;
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedFindOne() {
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty };
+				var where = "Name like '%test%'";
+
+				var sql = _queryGenerator.FindOne(Table, properties, where);
+				var expectedSql = "select top 1 Id, Name from [TestClasses] where " + where;
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -146,33 +192,7 @@ namespace Haberdasher.Tests
 				properties.Add("@id", _idProperty);
 
 				var sql = _queryGenerator.Insert(Table, properties, _idProperty);
-				var expectedSql = "set nocount on insert into [NonIdentityKeyClasses] (Id) values (@id)";
-
-				Assert.Equal(expectedSql, sql);
-			}
-		}
-
-		public class NonScopeIdentityKeyClassTests
-		{
-			private const string Table = "NonScopeIdentityKeyClasses";
-			private readonly CachedProperty _idProperty;
-			private readonly SqlServerGenerator _queryGenerator;
-
-			public NonScopeIdentityKeyClassTests() {
-				var type = typeof(NonScopeIdentityKeyClass);
-
-				_idProperty = new CachedProperty(type.GetProperty("Id"));
-				_queryGenerator = new SqlServerGenerator();
-			}
-
-			[Fact]
-			public void CreatesWellFormedInsert() {
-				var properties = new Dictionary<string, CachedProperty>();
-
-				properties.Add("@id", _idProperty);
-
-				var sql = _queryGenerator.Insert(Table, properties, _idProperty);
-				var expectedSql = "set nocount on insert into [NonScopeIdentityKeyClasses] (Id) values (@id) select @@IDENTITY";
+				var expectedSql = "insert into [NonIdentityKeyClasses] (Id) values (@id)";
 
 				Assert.Equal(expectedSql, sql);
 			}
@@ -214,13 +234,13 @@ namespace Haberdasher.Tests
 			}
 
 			[Fact]
-			public void CreatesWellFormedInsert() {
+			public void CreatesWellFormedInsertWithIdentity() {
 				var properties = new Dictionary<string, CachedProperty>();
 
 				properties.Add("@name", _nameProperty);
 				properties.Add("@description", _descriptionProperty);
 
-				var sql = _queryGenerator.Insert(Table, properties, _idProperty);
+				var sql = _queryGenerator.InsertWithIdentity(Table, properties, _idProperty);
 				var expectedSql = "set nocount on insert into [AliasedColumnsClasses] (ADifferentName, Description) values (@name, @description) select SCOPE_IDENTITY()";
 
 				Assert.Equal(expectedSql, sql);

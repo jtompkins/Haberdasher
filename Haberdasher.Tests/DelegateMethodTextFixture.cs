@@ -1,23 +1,27 @@
-﻿using Haberdasher.Tests.TestClasses;
-using Xunit;
+﻿using Xunit;
 
 namespace Haberdasher.Tests
 {
 	public class DelegateMethodTextFixture
 	{
+		private class TestClass
+		{
+			public int Id { get; set; }
+		}
+
 		public class GetterTests
 		{
 			private readonly CachedProperty _idProperty;
 
 			public GetterTests() {
-				var simpleClassType = typeof(SimpleClass);
+				var simpleClassType = typeof(TestClass);
 
 				_idProperty = new CachedProperty(simpleClassType.GetProperty("Id"));
 			}
 
 			[Fact]
 			public void GetterReturnsProperty() {
-				var s = new SimpleClass { Id = 1 };
+				var s = new TestClass { Id = 1 };
 
 				Assert.Equal(_idProperty.Getter(s), 1);
 			}
@@ -28,14 +32,14 @@ namespace Haberdasher.Tests
 			private readonly CachedProperty _idProperty;
 
 			public SetterTests() {
-				var simpleClassType = typeof(SimpleClass);
+				var simpleClassType = typeof(TestClass);
 
 				_idProperty = new CachedProperty(simpleClassType.GetProperty("Id"));
 			}
 
 			[Fact]
 			public void SetterSetsProperty() {
-				var s = new SimpleClass();
+				var s = new TestClass();
 
 				_idProperty.Setter(s, 1);
 
@@ -48,15 +52,15 @@ namespace Haberdasher.Tests
 			private readonly CachedProperty _idProperty;
 
 			public ComparerTests() {
-				var simpleClassType = typeof(SimpleClass);
+				var simpleClassType = typeof(TestClass);
 
 				_idProperty = new CachedProperty(simpleClassType.GetProperty("Id"));
 			}
 
 			[Fact]
 			public void ComparerComparesProperty() {
-				var a = new SimpleClass() { Id = 1 };
-				var b = new SimpleClass() { Id = 1 };
+				var a = new TestClass() { Id = 1 };
+				var b = new TestClass() { Id = 1 };
 
 				Assert.True(_idProperty.Comparer(a, b));
 

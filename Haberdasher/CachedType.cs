@@ -27,10 +27,6 @@ namespace Haberdasher
 
 			if (Key != null) return;
 
-			Key = KeyHelper.FindKey(SelectFields);
-
-			if (Key != null) return;
-
 			throw new MissingPrimaryKeyException("Entity type does not define a primary key.");
 		}
 

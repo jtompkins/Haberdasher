@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Haberdasher.Attributes;
 using Haberdasher.Support;
@@ -8,6 +10,8 @@ namespace Haberdasher
 {
 	public class CachedProperty
 	{
+		public static readonly IEnumerable<string> AutodetectableKeyNames = new List<string> { "id", "guid" }; 
+
 		public string Property { get; set; }
 		public string Alias { get; set; }
 
@@ -66,12 +70,16 @@ namespace Haberdasher
 
 			var keyAttribute = property.GetCustomAttribute<KeyAttribute>();
 
-			if (keyAttribute != null) {
+			if (keyAttribute != null || AutodetectableKeyNames.Any(n => n.Equals(property.Name, StringComparison.InvariantCultureIgnoreCase))) {
 				if (IsNullable)
 					throw new Exception("Key properties may not be marked with the Nullable attribute: " + Property);
 
 				IsKey = true;
-				IsIdentity = keyAttribute.IsIdentity && IsNumeric; //non-numeric columns cannot be identity columns
+
+				if (keyAttribute != null)
+					IsIdentity = keyAttribute.IsIdentity && IsNumeric; //non-numeric columns cannot be identity columns
+				else
+					IsIdentity = IsNumeric;
 
 				IsSelectable = true;
 				IsInsertable = !IsIdentity;
