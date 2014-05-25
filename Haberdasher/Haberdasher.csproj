@@ -50,6 +50,7 @@
     <Compile Include="Attributes\IgnoreAttribute.cs" />
     <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Attributes\NullableAttribute.cs" />
+    <Compile Include="Attributes\SingularAttribute.cs" />
     <Compile Include="CachedProperty.cs" />
     <Compile Include="CachedType.cs" />
     <Compile Include="Contracts\IEntityStore.cs" />
@@ -64,7 +65,7 @@
     <Compile Include="Support\Helpers\KeyHelper.cs" />
     <Compile Include="Support\ExpressionBuilders\SetterBuilder.cs" />
     <Compile Include="QueryGenerators\SqlServerGenerator.cs" />
-    <Compile Include="Support\Helpers\PluralizationHelper.cs" />
+    <Compile Include="Support\Helpers\TypeHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

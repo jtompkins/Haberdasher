@@ -4,7 +4,6 @@ namespace Haberdasher.Tests.TestClasses
 {
 	public class AliasedColumnsClass
 	{
-		[Key]
 		public int Id { get; set; }
 
 		[Alias("ADifferentName")]

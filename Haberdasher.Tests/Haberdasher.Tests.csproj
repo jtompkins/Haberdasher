@@ -57,14 +57,12 @@
     <Compile Include="SqlServerGeneratorFixture.cs" />
     <Compile Include="TestClasses\AdHocClass.cs" />
     <Compile Include="TestClasses\AliasedColumnsClass.cs" />
-    <Compile Include="TestClasses\AliasedColumnsClassEntityStore.cs" />
     <Compile Include="TestClasses\IgnoredColumnsClass.cs" />
     <Compile Include="TestClasses\NoKeyClass.cs" />
     <Compile Include="TestClasses\NonIdentityKeyClass.cs" />
     <Compile Include="TestClasses\NonScopeIdentityKeyClass.cs" />
     <Compile Include="TestClasses\NullableColumnsClass.cs" />
     <Compile Include="TestClasses\SimpleClass.cs" />
-    <Compile Include="TestClasses\SimpleClassEntityStore.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Haberdasher\Haberdasher.csproj">

@@ -2,7 +2,7 @@
 
 namespace Haberdasher.Attributes
 {
-	[AttributeUsage(AttributeTargets.Property)]
+	[AttributeUsage(AttributeTargets.Property | AttributeTargets.Class)]
 	public class AliasAttribute : Attribute
 	{
 		public string Alias { get; private set; }

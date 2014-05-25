@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
+using Haberdasher.Contracts;
 using Haberdasher.Tests.TestClasses;
 using Xunit;
 
@@ -14,15 +10,15 @@ namespace Haberdasher.Tests
 		private readonly CachedType _simpleType;
 		private readonly CachedType _aliasedType;
 
-		private readonly SimpleClassEntityStore _simpleEntityStore;
-		private readonly AliasedColumnsClassEntityStore _aliasedEntityStore;
+		private readonly EntityStore<SimpleClass, int> _simpleEntityStore;
+		private readonly EntityStore<AliasedColumnsClass, int> _aliasedEntityStore;
 
 		public HaberdasheryFixture() {
 			_simpleType = new CachedType(typeof(SimpleClass));
 			_aliasedType = new CachedType(typeof(AliasedColumnsClass));
 
-			_simpleEntityStore = new SimpleClassEntityStore();
-			_aliasedEntityStore = new AliasedColumnsClassEntityStore();
+			_simpleEntityStore = new EntityStore<SimpleClass, int>();
+			_aliasedEntityStore = new EntityStore<AliasedColumnsClass, int>();
 		}
 
 		[Fact]
