@@ -265,21 +265,49 @@ namespace Haberdasher
 		/// Inserts an entity into the database.
 		/// </summary>
 		/// <param name="entity">The entity to be inserted</param>
-		/// <returns>The primary key of the inserted entity</returns>
-		public TKey Insert(TEntity entity) {
+		/// <returns>The number of rows inserted</returns>
+		public int Insert(TEntity entity) {
 			if (entity == null)
 				throw new ArgumentException("Entity must not be null.");
 
 			var properties = BuildPropertyList(InsertFields);
 			var parameters = BuildParameterList(InsertFields, entity);
 
-			decimal identity;
+			var connection = GetConnection();
+			var result = 0;
+
+			try {
+				var sql = _queryGenerator.Insert(Table, properties, Key);
+				
+				result = connection.Execute(sql, parameters);
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Inserts an entity into the database.
+		/// </summary>
+		/// <param name="entity">The entity to be inserted</param>
+		/// <returns>The primary key of the inserted entity</returns>
+		public TKey InsertWithIdentity(TEntity entity) {
+			if (entity == null)
+				throw new ArgumentException("Entity must not be null.");
+
+			var properties = BuildPropertyList(InsertFields);
+			var parameters = BuildParameterList(InsertFields, entity);
+
+			object identity;
 
 			var connection = GetConnection();
 
 			try {
 				var sql = _queryGenerator.Insert(Table, properties, Key);
-				identity = connection.Query<decimal>(sql, parameters).Single();
+				identity = connection.Query<object>(sql, parameters).Single();
 			}
 			finally {
 				if (!_useProvidedConnection)
@@ -294,8 +322,26 @@ namespace Haberdasher
 		/// </summary>
 		/// <param name="entities">The entities to be inserted</param>
 		/// <returns>The primary key of the inserted entity</returns>
-		public IEnumerable<TKey> Insert(IEnumerable<TEntity> entities) {
-			throw new NotImplementedException();
+		public int Insert(IEnumerable<TEntity> entities) {
+			var properties = BuildPropertyList(InsertFields);
+
+			var connection = GetConnection();
+			var records = 0;
+
+			try {
+				foreach (var entity in entities) {
+					var parameters = BuildParameterList(InsertFields, entity);
+					var sql = _queryGenerator.Insert(Table, properties, Key);
+
+					records += connection.Execute(sql, parameters);
+				}
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
+			}
+
+			return records;
 		}
 
 		/// <summary>
@@ -336,7 +382,30 @@ namespace Haberdasher
 		/// <param name="entities">The entities to be updated</param>
 		/// <returns>The number of updated records</returns>
 		public int Update(IEnumerable<TEntity> entities) {
-			throw new NotImplementedException();
+			var properties = BuildPropertyList(UpdateFields);
+			var result = 0;
+
+			if (properties.Count <= 0) return result;
+
+			var connection = GetConnection();
+
+			try {
+				foreach (var entity in entities) {
+					var parameters = BuildParameterList(UpdateFields, entity);
+
+					parameters.Add(Key.Property, (TKey)Key.Getter(entity));
+
+					var keyParamName = _queryGenerator.FormatSqlParameter(Key.Property);
+
+					result += connection.Execute(_queryGenerator.Update(Table, properties, Key, keyParamName), parameters);
+				}
+			}
+			finally {
+				if (!_useProvidedConnection)
+					connection.Dispose();
+			}
+
+			return result;
 		}
 
 		/// <summary>

@@ -15,7 +15,8 @@ namespace Haberdasher.QueryGenerators
 		private const string FindFormat = "select {0} from [{1}] where {2}";
 		private const string FindOneFormat = "select top 1 {0} from [{1}] where {2}";
 
-		private const string InsertFormat = "set nocount on insert into [{0}] ({1}) values ({2}) {3}";
+		private const string InsertFormat = "insert into [{0}] ({1}) values ({2})";
+		private const string InsertWithIdentityFormat = "set nocount on insert into [{0}] ({1}) values ({2}) {3}";
 
 		private const string UpdateFormat = "update [{0}] set {1} where {2} = {3}";
 		private const string UpdateManyFormat = "update [{0}] set {1} where {2} in {3}";
@@ -106,12 +107,24 @@ namespace Haberdasher.QueryGenerators
 				valueParams.Add(kvp.Key);
 			}
 
+			return String.Format(InsertFormat, table, String.Join(", ", fields), String.Join(", ", valueParams)).Trim();
+		}
+
+		public string InsertWithIdentity(string table, IDictionary<string, CachedProperty> properties, CachedProperty key) {
+			var fields = new List<string>();
+			var valueParams = new List<string>();
+
+			foreach (var kvp in properties) {
+				fields.Add(kvp.Value.Name);
+				valueParams.Add(kvp.Key);
+			}
+
 			var insertOptions = "";
 
 			if (key.IsIdentity)
 				insertOptions = key.UseScopeIdentity ? "select SCOPE_IDENTITY()" : "select @@IDENTITY";
 
-			return String.Format(InsertFormat, table, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
+			return String.Format(InsertWithIdentityFormat, table, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
 		}
 
 		/// <summary>

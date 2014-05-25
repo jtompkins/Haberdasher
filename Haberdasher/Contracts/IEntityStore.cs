@@ -51,15 +51,22 @@ namespace Haberdasher.Contracts
 		/// Inserts an entity into the database.
 		/// </summary>
 		/// <param name="entity">The entity to be inserted</param>
+		/// <returns>The number of rows inserted</returns>
+		int Insert(TEntity entity);
+
+		/// <summary>
+		/// Inserts an entity into the database.
+		/// </summary>
+		/// <param name="entity">The entity to be inserted</param>
 		/// <returns>The primary key of the inserted entity</returns>
-		TKey Insert(TEntity entity);
+		TKey InsertWithIdentity(TEntity entity);
 
 		/// <summary>
 		/// Inserts multiple entities into the database.
 		/// </summary>
 		/// <param name="entities">The entities to be inserted</param>
 		/// <returns>The primary key of the inserted entity</returns>
-		IEnumerable<TKey> Insert(IEnumerable<TEntity> entities);
+		int Insert(IEnumerable<TEntity> entities);
 
 		/// <summary>
 		/// Updates an entity in the database.

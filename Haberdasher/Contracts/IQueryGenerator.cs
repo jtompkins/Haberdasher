@@ -52,6 +52,15 @@ namespace Haberdasher.Contracts
 		/// <param name="table">The name of the table</param>
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
+		string InsertWithIdentity(string table, IDictionary<string, CachedProperty> properties, CachedProperty key);
+
+
+		/// <summary>
+		/// Generates an INSERT statement using the passed-in properties.
+		/// </summary>
+		/// <param name="table">The name of the table</param>
+		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
+		/// <param name="key">The primary key of the table</param>
 		string Insert(string table, IDictionary<string, CachedProperty> properties, CachedProperty key);
 
 		/// <summary>
