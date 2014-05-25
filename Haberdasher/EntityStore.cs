@@ -274,7 +274,7 @@ namespace Haberdasher
 			var parameters = BuildParameterList(InsertFields, entity);
 
 			var connection = GetConnection();
-			var result = 0;
+			int result;
 
 			try {
 				var sql = _queryGenerator.Insert(Table, properties, Key);
