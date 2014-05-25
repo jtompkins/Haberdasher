@@ -119,10 +119,7 @@ namespace Haberdasher.QueryGenerators
 				valueParams.Add(kvp.Key);
 			}
 
-			var insertOptions = "";
-
-			if (key.IsIdentity)
-				insertOptions = key.UseScopeIdentity ? "select SCOPE_IDENTITY()" : "select @@IDENTITY";
+			var insertOptions = (key.IsIdentity) ? "select SCOPE_IDENTITY()" : "";
 
 			return String.Format(InsertWithIdentityFormat, table, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
 		}

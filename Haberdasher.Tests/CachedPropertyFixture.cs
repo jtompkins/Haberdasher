@@ -29,11 +29,6 @@ namespace Haberdasher.Tests
 			}
 
 			[Fact]
-			public void IdUsesScopeIdentity() {
-				Assert.Equal(true, _idProperty.UseScopeIdentity);
-			}
-
-			[Fact]
 			public void IdIsNotAliased() {
 				Assert.Equal(false, _idProperty.IsAliased);
 			}
@@ -71,11 +66,6 @@ namespace Haberdasher.Tests
 			[Fact]
 			public void NameIsNotIdentity() {
 				Assert.Equal(false, _nameProperty.IsIdentity);
-			}
-
-			[Fact]
-			public void NameDoesNotUseScopeIdentity() {
-				Assert.Equal(false, _nameProperty.UseScopeIdentity);
 			}
 
 			[Fact]
@@ -153,11 +143,6 @@ namespace Haberdasher.Tests
 			[Fact]
 			public void IdIsIdentity() {
 				Assert.Equal(true, _idProperty.IsIdentity);
-			}
-
-			[Fact]
-			public void IdDoesNotUseScopeIdentity() {
-				Assert.Equal(false, _idProperty.UseScopeIdentity);
 			}
 		}
 

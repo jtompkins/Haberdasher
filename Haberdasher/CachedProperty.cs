@@ -29,7 +29,6 @@ namespace Haberdasher
 		public bool IsNumeric { get; private set; }
 		public bool IsAliased { get; private set; }
 		public bool IsIdentity { get; private set; }
-		public bool UseScopeIdentity { get; private set; }
 
 		public bool IsKey { get; private set; }
 		public bool IsSelectable { get; private set; }
@@ -77,8 +76,6 @@ namespace Haberdasher
 				IsSelectable = true;
 				IsInsertable = !IsIdentity;
 				IsUpdatable = false;
-
-				UseScopeIdentity = property.PropertyType == typeof(int) || property.PropertyType == typeof(long);
 			}
 			else {
 				var ignoreAttribute = property.GetCustomAttribute<IgnoreAttribute>();
