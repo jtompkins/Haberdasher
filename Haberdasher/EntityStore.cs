@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Diagnostics;
 using System.Linq;
 
 using Dapper;
@@ -225,7 +224,7 @@ namespace Haberdasher
 		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
 		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public IEnumerable<TEntity> Find(string whereClause, object param = null) {
-			var sql = _queryGenerator.FindOne(Table, SelectFields, whereClause);
+			var sql = _queryGenerator.Find(Table, SelectFields, whereClause);
 
 			IEnumerable<TEntity> entities;
 
@@ -248,7 +247,7 @@ namespace Haberdasher
 		/// <param name="whereClause">A string containing the WHERE clause's predicate</param>
 		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public TEntity FindOne(string whereClause, object param = null) {
-			var sql = _queryGenerator.Find(Table, SelectFields, whereClause);
+			var sql = _queryGenerator.FindOne(Table, SelectFields, whereClause);
 			var connection = GetConnection();
 
 			try {
