@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Haberdasher.Attributes;
 using Haberdasher.QueryGenerators;
+using Haberdasher.Support.Helpers;
 using Xunit;
 
 namespace Haberdasher.Tests
@@ -8,6 +9,13 @@ namespace Haberdasher.Tests
 	public class SqlServerGeneratorFixture
 	{
 		private class TestClass
+		{
+			public int Id { get; set; }
+			public string Name { get; set; }
+		}
+
+		[Alias("TestClasses")]
+		private class AliasedTestClass
 		{
 			public int Id { get; set; }
 			public string Name { get; set; }
@@ -193,6 +201,147 @@ namespace Haberdasher.Tests
 
 				var sql = _queryGenerator.Insert(Table, properties, _idProperty);
 				var expectedSql = "insert into [NonIdentityKeyClasses] (Id) values (@id)";
+
+				Assert.Equal(expectedSql, sql);
+			}
+		}
+
+		public class AliasedTestClassTests
+		{
+			private readonly string _table;
+
+			private readonly CachedProperty _idProperty;
+			private readonly CachedProperty _nameProperty;
+
+			private readonly SqlServerGenerator _queryGenerator;
+
+			public AliasedTestClassTests() {
+				var aliasedClassType = typeof(AliasedTestClass);
+				_table = NameHelper.GetEntityTableName(aliasedClassType);
+
+
+				_idProperty = new CachedProperty(aliasedClassType.GetProperty("Id"));
+				_nameProperty = new CachedProperty(aliasedClassType.GetProperty("Name"));
+
+				_queryGenerator = new SqlServerGenerator();
+			}
+
+			[Fact]
+			public void CreatesWellFormedSelect() {
+				var sql = _queryGenerator.Select(_table, new List<CachedProperty>() { _idProperty, _nameProperty }, _idProperty, "@id");
+				var expectedSql = "select Id, Name from [TestClasses] where Id = @id";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedSelectMany() {
+				var sql = _queryGenerator.SelectMany(_table, new List<CachedProperty>() { _idProperty, _nameProperty }, _idProperty, "@ids");
+				var expectedSql = "select Id, Name from [TestClasses] where Id in @ids";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedInsert() {
+				var properties = new Dictionary<string, CachedProperty>();
+
+				properties.Add("@name", _nameProperty);
+
+				var sql = _queryGenerator.Insert(_table, properties, _idProperty);
+				var expectedSql = "insert into [TestClasses] (Name) values (@name)";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedInsertWithIdentity() {
+				var properties = new Dictionary<string, CachedProperty>();
+
+				properties.Add("@name", _nameProperty);
+
+				var sql = _queryGenerator.InsertWithIdentity(_table, properties, _idProperty);
+				var expectedSql = "set nocount on insert into [TestClasses] (Name) values (@name) select SCOPE_IDENTITY()";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedUpdate() {
+				var properties = new Dictionary<string, CachedProperty>();
+
+				properties.Add("@name", _nameProperty);
+
+				var sql = _queryGenerator.Update(_table, properties, _idProperty, "@id");
+				var expectedSql = "update [TestClasses] set Name = @name where Id = @id";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedUpdateMany() {
+				var properties = new Dictionary<string, CachedProperty>();
+
+				properties.Add("@name", _nameProperty);
+
+				var sql = _queryGenerator.UpdateMany(_table, properties, _idProperty, "@ids");
+				var expectedSql = "update [TestClasses] set Name = @name where Id in @ids";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedDeleteAll() {
+				var sql = _queryGenerator.DeleteAll(_table);
+				var expectedSql = "truncate table [TestClasses]";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedDelete() {
+				var sql = _queryGenerator.Delete(_table, _idProperty, "@id");
+				var expectedSql = "delete from [TestClasses] where Id = @id";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedDeleteMany() {
+				var sql = _queryGenerator.DeleteMany(_table, _idProperty, "@ids");
+				var expectedSql = "delete from [TestClasses] where Id in @ids";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedSelectAll() {
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty };
+
+				var sql = _queryGenerator.SelectAll(_table, properties, _idProperty);
+				var expectedSql = "select Id, Name from [TestClasses] order by Id";
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedFind() {
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty };
+				var where = "Name like '%test%'";
+
+				var sql = _queryGenerator.Find(_table, properties, where);
+				var expectedSql = "select Id, Name from [TestClasses] where " + where;
+
+				Assert.Equal(expectedSql, sql);
+			}
+
+			[Fact]
+			public void CreatesWellFormedFindOne() {
+				var properties = new List<CachedProperty>() { _idProperty, _nameProperty };
+				var where = "Name like '%test%'";
+
+				var sql = _queryGenerator.FindOne(_table, properties, where);
+				var expectedSql = "select top 1 Id, Name from [TestClasses] where " + where;
 
 				Assert.Equal(expectedSql, sql);
 			}
