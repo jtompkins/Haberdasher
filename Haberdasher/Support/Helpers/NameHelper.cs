@@ -6,11 +6,13 @@ using Haberdasher.Attributes;
 
 namespace Haberdasher.Support.Helpers
 {
-	public static class TypeHelper
+	public static class NameHelper
 	{
 		public static string GetEntityTableName<T>() {
-			var type = typeof (T);
+			return GetEntityTableName(typeof (T));
+		}
 
+		public static string GetEntityTableName(Type type) {
 			// there are three cases here:
 			//	1. The type name needs to be pluralized (the most common case)
 			//	2. The type name is aliased (look for the AliasAttribute on the type)
@@ -25,18 +27,7 @@ namespace Haberdasher.Support.Helpers
 			if (alias != null && !String.IsNullOrEmpty(alias.Alias))
 				return alias.Alias;
 
-			return Pluralize(type.Name);
-		}
-
-		public static string Pluralize(string name) {
-			if (String.IsNullOrEmpty(name))
-				return null;
-
-			var service = PluralizationService.CreateService(new CultureInfo("en-US"));
-
-			return service.IsPlural(name) 
-				? name 
-				: service.Pluralize(name);
+			return PluralizationHelper.Pluralize(type.Name);
 		}
 	}
 }

@@ -7,13 +7,17 @@ namespace Haberdasher
 {
 	public class CachedType
 	{
-		public CachedProperty Key { get; set; }
+		public string Name { get; private set; }
+
+		public CachedProperty Key { get; private set; }
 
 		public IList<CachedProperty> SelectFields { get; private set; }
 		public IList<CachedProperty> InsertFields { get; private set; }
 		public IList<CachedProperty> UpdateFields { get; private set; }
 
 		public CachedType(Type type) {
+			Name = NameHelper.GetEntityTableName(type);
+
 			SelectFields = new List<CachedProperty>();
 			InsertFields = new List<CachedProperty>();
 			UpdateFields = new List<CachedProperty>();

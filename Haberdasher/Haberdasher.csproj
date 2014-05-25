@@ -65,7 +65,8 @@
     <Compile Include="Support\Helpers\KeyHelper.cs" />
     <Compile Include="Support\ExpressionBuilders\SetterBuilder.cs" />
     <Compile Include="QueryGenerators\SqlServerGenerator.cs" />
-    <Compile Include="Support\Helpers\TypeHelper.cs" />
+    <Compile Include="Support\Helpers\NameHelper.cs" />
+    <Compile Include="Support\Helpers\PluralizationHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

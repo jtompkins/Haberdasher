@@ -54,7 +54,7 @@ namespace Haberdasher
 				CachedTypes.Add(_entityType, new CachedType(_entityType));
 
 			_connectionString = ConnectionStringHelper.FindFirst();
-			_queryGenerator = new SqlServerGenerator(TypeHelper.GetEntityTableName<TEntity>());
+			_queryGenerator = new SqlServerGenerator(NameHelper.GetEntityTableName<TEntity>());
 		}
 
 		public EntityStore(IQueryGenerator generator) : this() {
