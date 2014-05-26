@@ -10,7 +10,7 @@ Haberdasher is available via [Nuget](http://www.nuget.org/). Install from the Pa
 
 ## Preparing your app for Haberdasher
 
-Even though Haberdasher isn't an ORM in the traditional sense, some of the same concepts apply. Haberdasher conceptualizes your database as a series of entity types mapped one-to-one to tables in your database. Your entities are basic POCO classes plus a few simple annotations. Actual communication with your database is done though a context-ish base class called a `SqlTable`, which you'll extend for each of your entity types.
+Even though Haberdasher isn't an ORM in the traditional sense, some of the same concepts apply. Haberdasher conceptualizes your database as a series of entity types mapped one-to-one to tables in your database. Your entities are basic POCO classes plus a few simple annotations. Actual communication with your database is done though a context-ish base class called a `EntityStore`.
 
 ### Annotate your entities
 
@@ -69,6 +69,7 @@ When generating SQL for database reads and writes, Haberdasher will include all 
 * `Insert`
 * `Update`
 
+
 	public class SimpleClass {
 		[Key]
 		public int Id { get; set; }
@@ -86,7 +87,7 @@ When generating SQL for database reads and writes, Haberdasher will include all 
 
 ## Using Haberdasher
 
-Haberdasher has a small API surface centered around the `EntityStore` class. For this walkthrough, we'll be using the following types:
+Haberdasher has a small API surface centered around the `EntityStore` class. For this walkthrough, we'll be using the following type:
 
 	public class Product 
 	{
