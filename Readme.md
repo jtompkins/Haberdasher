@@ -57,6 +57,26 @@ By default, Haberdasher will automatically "map" all of the properties in your e
 
 When Haberdasher generates SQL for this entity, it will properly alias the columns to match your entity.
 
+#### Naming Tables
+
+Haberdasher assumes a contentional Singular/Plural naming scheme for your entities and tables. For example, if you had a type called `Product`, Haberdasher will assume the table is named `Products`. You can override this assumption in two ways. If your table name is singular, add the `SingularAttribute` to your class:
+
+	[Singular]
+	public class Product {
+		public int Id { get; set; }
+		
+		public string Name { get; set; }
+	}
+
+If your table name doesn't match your entity name at all, you can alias the name of the entity for SQL generation:
+
+	[Alias("ProductItems")]
+	public class Product {
+		public int Id { get; set; }
+		
+		public string Name { get; set; }
+	}
+
 #### Preventing Reads and Writes
 
 When generating SQL for database reads and writes, Haberdasher will include all of the properties in your entity. You can tell Haberdasher to ignore certain properties using the `IgnoreAttribute`.
