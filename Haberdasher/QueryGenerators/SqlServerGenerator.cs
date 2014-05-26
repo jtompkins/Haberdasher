@@ -107,21 +107,10 @@ namespace Haberdasher.QueryGenerators
 				valueParams.Add(kvp.Key);
 			}
 
-			return String.Format(InsertFormat, table, String.Join(", ", fields), String.Join(", ", valueParams)).Trim();
-		}
-
-		public string InsertWithIdentity(string table, IDictionary<string, CachedProperty> properties, CachedProperty key) {
-			var fields = new List<string>();
-			var valueParams = new List<string>();
-
-			foreach (var kvp in properties) {
-				fields.Add(kvp.Value.Name);
-				valueParams.Add(kvp.Key);
-			}
-
+			var format = key.IsIdentity ? InsertWithIdentityFormat : InsertFormat;
 			var insertOptions = (key.IsIdentity) ? "select SCOPE_IDENTITY()" : "";
 
-			return String.Format(InsertWithIdentityFormat, table, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
+			return String.Format(format, table, String.Join(", ", fields), String.Join(", ", valueParams), insertOptions).Trim();
 		}
 
 		/// <summary>

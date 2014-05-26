@@ -79,18 +79,6 @@ namespace Haberdasher.Tests
 				properties.Add("@name", _nameProperty);
 
 				var sql = _queryGenerator.Insert(Table, properties, _idProperty);
-				var expectedSql = "insert into [TestClasses] (Name) values (@name)";
-
-				Assert.Equal(expectedSql, sql);
-			}
-
-			[Fact]
-			public void CreatesWellFormedInsertWithIdentity() {
-				var properties = new Dictionary<string, CachedProperty>();
-
-				properties.Add("@name", _nameProperty);
-
-				var sql = _queryGenerator.InsertWithIdentity(Table, properties, _idProperty);
 				var expectedSql = "set nocount on insert into [TestClasses] (Name) values (@name) select SCOPE_IDENTITY()";
 
 				Assert.Equal(expectedSql, sql);
@@ -249,18 +237,6 @@ namespace Haberdasher.Tests
 				properties.Add("@name", _nameProperty);
 
 				var sql = _queryGenerator.Insert(_table, properties, _idProperty);
-				var expectedSql = "insert into [TestClasses] (Name) values (@name)";
-
-				Assert.Equal(expectedSql, sql);
-			}
-
-			[Fact]
-			public void CreatesWellFormedInsertWithIdentity() {
-				var properties = new Dictionary<string, CachedProperty>();
-
-				properties.Add("@name", _nameProperty);
-
-				var sql = _queryGenerator.InsertWithIdentity(_table, properties, _idProperty);
 				var expectedSql = "set nocount on insert into [TestClasses] (Name) values (@name) select SCOPE_IDENTITY()";
 
 				Assert.Equal(expectedSql, sql);
@@ -383,13 +359,13 @@ namespace Haberdasher.Tests
 			}
 
 			[Fact]
-			public void CreatesWellFormedInsertWithIdentity() {
+			public void CreatesWellFormedInsert() {
 				var properties = new Dictionary<string, CachedProperty>();
 
 				properties.Add("@name", _nameProperty);
 				properties.Add("@description", _descriptionProperty);
 
-				var sql = _queryGenerator.InsertWithIdentity(Table, properties, _idProperty);
+				var sql = _queryGenerator.Insert(Table, properties, _idProperty);
 				var expectedSql = "set nocount on insert into [AliasedColumnsClasses] (ADifferentName, Description) values (@name, @description) select SCOPE_IDENTITY()";
 
 				Assert.Equal(expectedSql, sql);
