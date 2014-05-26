@@ -61,7 +61,7 @@ When Haberdasher generates SQL for this entity, it will properly alias the colum
 
 When generating SQL for database reads and writes, Haberdasher will include all of the properties in your entity. You can tell Haberdasher to ignore certain properties using the `IgnoreAttribute`.
 
-`IgnoreAttribute` takes one argument, an enum of type `IgnoreTypeEnum` that allows you to specify which operations should ignore the property. `Find Name` has the following possible values: 
+`IgnoreAttribute` takes one argument, an enum of type `IgnoreTypeEnum` that allows you to specify which operations should ignore the property. `IgnoreAttribute` has the following possible values: 
 
 * `All`
 * `Write`
@@ -69,6 +69,7 @@ When generating SQL for database reads and writes, Haberdasher will include all 
 * `Insert`
 * `Update`
 
+Key columns always SELECT-able. Identity keys are always ignored for INSERTs and UPDATEs.
 
 	public class SimpleClass {
 		[Key]
