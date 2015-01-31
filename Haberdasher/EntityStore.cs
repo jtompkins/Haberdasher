@@ -70,6 +70,7 @@ namespace Haberdasher
 			if (_connectionString == null)
 				throw new ArgumentException("A connection string must be specified, or there must be at least one connection string set in your configuration file.");
 		}
+
 		public EntityStore(IDbConnection connection)
 			: this() {
 			_connection = connection;
@@ -225,10 +226,9 @@ namespace Haberdasher
 		/// <param name="param">Parameters to be passed to the WHERE clause</param>
 		public IEnumerable<TEntity> Find(string whereClause, object param = null) {
 			var sql = _queryGenerator.Find(Table, SelectFields, whereClause);
+			var connection = GetConnection();
 
 			IEnumerable<TEntity> entities;
-
-			var connection = GetConnection();
 
 			try {
 				entities = connection.Query<TEntity>(sql, param);
