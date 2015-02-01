@@ -58,6 +58,7 @@
     <Compile Include="Contracts\IQueryGenerator.cs" />
     <Compile Include="EntityStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryGenerators\SqliteGenerator.cs" />
     <Compile Include="Support\ExpressionBuilders\ComparerBuilder.cs" />
     <Compile Include="Support\Helpers\ConnectionStringHelper.cs" />
     <Compile Include="Support\Enums.cs" />

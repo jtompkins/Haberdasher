@@ -301,20 +301,23 @@ namespace Haberdasher
 			var properties = BuildPropertyList(InsertFields);
 			var parameters = BuildParameterList(InsertFields, entity);
 
-			object identity;
-
+			var identity = default(TKey);
 			var connection = GetConnection();
 
 			try {
 				var sql = _queryGenerator.Insert(Table, properties, Key);
-				identity = connection.Query<object>(sql, parameters).Single();
+
+				if (Key.IsIdentity)
+					identity = connection.Query<TKey>(sql, parameters).Single();
+				else
+					connection.Execute(sql, parameters);
 			}
 			finally {
 				if (!_useProvidedConnection)
 					connection.Dispose();
 			}
 
-			return Key.IsIdentity ? (TKey)Convert.ChangeType(identity, typeof(TKey)) : (TKey)Key.Getter(entity);
+			return Key.IsIdentity ? identity : (TKey)Key.Getter(entity);
 		}
 
 		/// <summary>
