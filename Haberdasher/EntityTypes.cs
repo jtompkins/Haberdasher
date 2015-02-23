@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 
 namespace Haberdasher
 {
@@ -16,6 +17,9 @@ namespace Haberdasher
 
 			if (registerAction != null)
 				registerAction(entityType);
+
+			if (entityType.KeyField == null)
+				throw new MissingPrimaryKeyException("No primary key defined for type: " + entityType.Name);
 
 			var type = typeof(T);
 

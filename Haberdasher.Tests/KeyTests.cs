@@ -1,117 +1,138 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using Haberdasher.Support;
 using Xunit;
 
 namespace Haberdasher.Tests
 {
 	public class KeyTestsFixure
 	{
-		//private class KeyClass
-		//{
-		//	public int Id { get; set; }
-		//}
+		private class KeyClass
+		{
+			public int Id { get; set; }
+		}
 
-		//private class MissingKeyClass
-		//{
-		//	public string Name { get; set; }
-		//}
+		private class MissingKeyClass
+		{
+			public string Name { get; set; }
+		}
 
-		//private class MarkedKeyClass
-		//{
-		//	[Key]
-		//	public int Id { get; set; }
-		//}
+		[Fact]
+		public void FindsRegisteredKey() {
+			var type = EntityTypes.Register<KeyClass>(t => {
+				t.Key(c => c.Id);
+			});
 
-		//private class NonIdentityKeyClass
-		//{
-		//	[Key(false)]
-		//	public int Id { get; set; }
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyFindsMarkedKey() {
-		//	var type = typeof(MarkedKeyClass);
+			Assert.Equal(true, property.IsKey);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void AutodetectsKey()
+		{
+			var type = EntityTypes.Register<KeyClass>();
 
-		//	Assert.Equal(true, idProperty.IsKey);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyFindsUnmarkedKey() {
-		//	var type = typeof(KeyClass);
+			Assert.Equal(true, property.IsKey);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void MarksAutodetectedKeyAsIdentity() {
+			var type = EntityTypes.Register<KeyClass>();
 
-		//	Assert.Equal(true, idProperty.IsKey);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyMarksUnmarkedKeyAsIdentity() {
-		//	var type = typeof(KeyClass);
+			Assert.Equal(true, property.IsKey);
+			Assert.Equal(true, property.IsIdentity);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void MarksNumericKeys() {
+			var type = EntityTypes.Register<KeyClass>();
 
-		//	Assert.Equal(true, idProperty.IsKey);
-		//	Assert.Equal(true, idProperty.IsIdentity);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyMarksNumericKeys() {
-		//	var type = typeof(MarkedKeyClass);
+			Assert.Equal(true, property.IsNumeric);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void MarksRegisteredKeysAsIdentity() {
+			var type = EntityTypes.Register<KeyClass>(t => {
+				t.Key(c => c.Id);
+			});
 
-		//	Assert.Equal(true, idProperty.IsNumeric);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyMarksIdentityKeys() {
-		//	var type = typeof(MarkedKeyClass);
+			Assert.Equal(true, property.IsIdentity);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void DoesNotMarkNonIdentityRegisteredKeysAsIdentity() {
+			var type = EntityTypes.Register<KeyClass>(t => {
+				t.Key(c => c.Id, false);
+			});
 
-		//	Assert.Equal(true, idProperty.IsIdentity);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyMarksNonIdentityKeys() {
-		//	var type = typeof(NonIdentityKeyClass);
+			Assert.Equal(false, property.IsIdentity);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void MarksKeyAsSelectable() {
+			var type = EntityTypes.Register<KeyClass>();
 
-		//	Assert.Equal(false, idProperty.IsIdentity);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyMarksIdAsSelectable() {
-		//	var type = typeof(MarkedKeyClass);
+			Assert.Equal(true, property.IsSelectable);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void MarksIdentityKeyAsNotInsertable() {
+			var type = EntityTypes.Register<KeyClass>();
 
-		//	Assert.Equal(true, idProperty.IsSelectable);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyMarksIdAsNotInsertable() {
-		//	var type = typeof(MarkedKeyClass);
+			Assert.Equal(false, property.IsInsertable);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void MarksIdentityKeyAsNotUpdatable() {
+			var type = EntityTypes.Register<KeyClass>();
 
-		//	Assert.Equal(false, idProperty.IsInsertable);
-		//}
+			var property = type.GetProperty<KeyClass>(c => c.Id);
 
-		//[Fact]
-		//public void CachedPropertyMarksIdAsNotUpdatable() {
-		//	var type = typeof(MarkedKeyClass);
+			Assert.Equal(false, property.IsUpdatable);
+		}
 
-		//	var idProperty = new EntityProperty(type.GetProperty("Id"));
+		[Fact]
+		public void ThrowsForMissingKey() {
+			Assert.Throws<MissingPrimaryKeyException>(() => EntityTypes.Register<MissingKeyClass>());
+		}
 
-		//	Assert.Equal(false, idProperty.IsUpdatable);
-		//}
+		[Fact]
+		public void ThrowsForNullableKey() {
+			var ex = Assert.Throws<Exception>(() => {
+				var type = EntityTypes.Register<KeyClass>(t => {
+					t.Key(c => c.Id);
+					t.Ignore(c => c.Id, IgnoreTypeEnum.Select);
+				});
+			});
 
-		//[Fact]
-		//public void CachedTypeThrowsForMissingKey() {
-		//	Assert.Throws<MissingPrimaryKeyException>(() => new EntityType<MissingKeyClass>());
-		//}
+			Assert.Equal("Cannot override ignore properties of primary key: Id", ex.Message);
+		}
+
+		[Fact]
+		public void ThrowsWhenTryingToIgnoreKey() {
+			var ex = Assert.Throws<Exception>(() => {
+				var type = EntityTypes.Register<KeyClass>(t => {
+					t.Key(c => c.Id);
+					t.Nullable(c => c.Id);
+				});
+			});
+
+			Assert.Equal("Cannot set primary key to be nullable: Id", ex.Message);
+		}
 	}
 }

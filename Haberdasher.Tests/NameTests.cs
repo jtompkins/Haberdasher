@@ -58,37 +58,38 @@ namespace Haberdasher.Tests
 			Assert.Equal("Student", type.Name);
 		}
 
-		//[Fact]
-		//public void AttributeMarksPropertiesAsAliased() {
-		//	var type = typeof(AliasedColumnsClass);
+		[Fact]
+		public void MarksPropertiesAsAliased() {
+			var type = EntityTypes.Register<FluentAliasedColumnsClass>(t => {
+				t.Alias(c => c.Name, "ADifferentName");
+			});
 
-		//	var nameProperty = new EntityProperty(type.GetProperty("Name"));
+			var property = type.GetProperty<FluentAliasedColumnsClass>(c => c.Name);
 
-		//	Assert.Equal(true, nameProperty.IsAliased);
-		//}
+			Assert.Equal(true, property.IsAliased);
+		}
 
-		//public void FluentApiMarksPropertiesAsAliased() {
-		//	EntityTypes.Register<FluentAliasedColumnsClass>(t => {
-		//		t.Alias(c => c.Name, "ADifferentName");
-		//	});
-		//}
+		[Fact]
+		public void AliasesPropertiesToProperValue() {
+			var type = EntityTypes.Register<FluentAliasedColumnsClass>(t => {
+				t.Alias(c => c.Name, "ADifferentName");
+			});
 
-		//[Fact]
-		//public void CachedPropertyAliasesPropertiesToProperValue() {
-		//	var type = typeof(AliasedColumnsClass);
+			var property = type.GetProperty<FluentAliasedColumnsClass>(c => c.Name);
 
-		//	var nameProperty = new EntityProperty(type.GetProperty("Name"));
+			Assert.Equal("ADifferentName", property.Name);
+		}
 
-		//	Assert.Equal("ADifferentName", nameProperty.Alias);
-		//}
+		[Fact]
+		public void DoesNotAliasPropertiesThatAreAliasedToNull() {
+			var type = EntityTypes.Register<FluentAliasedColumnsClass>(t => {
+				t.Alias(c => c.Name, null);
+			});
 
-		//[Fact]
-		//public void CachedPropertyDoesNotAliasPropertiesThatAreAliasedToNull() {
-		//	var type = typeof(AliasedColumnsClass);
+			var property = type.GetProperty<FluentAliasedColumnsClass>(c => c.Name);
 
-		//	var descProperty = new EntityProperty(type.GetProperty("Description"));
-
-		//	Assert.Equal(false, descProperty.IsAliased);
-		//}
+			Assert.Equal(false, property.IsAliased);
+			Assert.Equal("Name", property.Name);
+		}
 	}
 }

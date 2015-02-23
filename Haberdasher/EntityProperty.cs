@@ -55,6 +55,10 @@ namespace Haberdasher
 			_isValueType = property.PropertyType.IsValueType;
 			_isNullableType = property.PropertyType.IsNullableValueType();
 
+			IsSelectable = true;
+			IsInsertable = true;
+			IsUpdatable = true;
+
 			if (_isNullableType)
 				SetNullable();
 			else
@@ -70,7 +74,7 @@ namespace Haberdasher
 
 		internal EntityProperty SetKey(bool? isIdentity = null) {
 			if (IsNullable)
-				throw new Exception("Key properties may not be marked as Nullable attribute: " + Property);
+				throw new Exception("Cannot set primary key to be nullable: " + Property);
 
 			IsKey = true;
 			IsIdentity = isIdentity.HasValue ? isIdentity.GetValueOrDefault() && IsNumeric : IsNumeric;
@@ -86,16 +90,11 @@ namespace Haberdasher
 			if (IsKey)
 				throw new Exception("Cannot override ignore properties of primary key: " + Property);
 
-			if (type.HasValue) {
-				IsSelectable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Select;
-				IsInsertable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Writes && type != IgnoreTypeEnum.Insert;
-				IsUpdatable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Writes && type != IgnoreTypeEnum.Update;
-			}
-			else {
-				IsSelectable = true;
-				IsInsertable = true;
-				IsUpdatable = true;
-			}
+			if (!type.HasValue) return this;
+
+			IsSelectable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Select;
+			IsInsertable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Writes && type != IgnoreTypeEnum.Insert;
+			IsUpdatable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Writes && type != IgnoreTypeEnum.Update;
 
 			return this;
 		}
@@ -115,7 +114,7 @@ namespace Haberdasher
 				throw new Exception("Cannot set primary key to be nullable: " + Property);
 
 			if (_isValueType && !_isNullableType)
-				throw new Exception("Non-Nullable value type properties may not be marked Nullable: " + Property);
+				throw new Exception("Cannot set non-nullable property to be nullable: " + Property);
 
 			IsNullable = true;
 

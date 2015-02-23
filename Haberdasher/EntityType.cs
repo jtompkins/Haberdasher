@@ -48,14 +48,14 @@ namespace Haberdasher
 		#region Fluent Interface Support
 
 		private EntityProperty GetMemberByName(string memberName) {
-			var property = SelectFields.FirstOrDefault(p => p.Name.Equals(memberName));
+			var property = SelectFields.FirstOrDefault(p => p.Property.Equals(memberName));
 
 			if (property != null)
 				return property;
 
-			property = InsertFields.FirstOrDefault(p => p.Name.Equals(memberName));
+			property = InsertFields.FirstOrDefault(p => p.Property.Equals(memberName));
 
-			return property ?? UpdateFields.FirstOrDefault(p => p.Name.Equals(memberName));
+			return property ?? UpdateFields.FirstOrDefault(p => p.Property.Equals(memberName));
 		}
 
 		private string GetMemberNameFromExpression<T>(Expression<Func<T, object>> property) {
@@ -77,7 +77,7 @@ namespace Haberdasher
 			return propertyInfo.Name;
 		}
 
-		public EntityProperty GetPropertyFromExpression<T>(Expression<Func<T, object>> property) {
+		public EntityProperty GetProperty<T>(Expression<Func<T, object>> property) {
 			var name = GetMemberNameFromExpression(property);
 			var cachedProperty = GetMemberByName(name);
 
@@ -106,8 +106,8 @@ namespace Haberdasher
 			return this;
 		} 
 
-		public EntityType<TEntity> Key(Expression<Func<TEntity, object>> property, bool? isIdentity) {
-			var cachedProperty = GetPropertyFromExpression(property);
+		public EntityType<TEntity> Key(Expression<Func<TEntity, object>> property, bool? isIdentity = null) {
+			var cachedProperty = GetProperty(property);
 
 			cachedProperty.SetKey(isIdentity);
 
@@ -115,7 +115,7 @@ namespace Haberdasher
 		}
 
 		public EntityType<TEntity> Ignore(Expression<Func<TEntity, object>> property, IgnoreTypeEnum? type) {
-			var cachedProperty = GetPropertyFromExpression(property);
+			var cachedProperty = GetProperty(property);
 
 			cachedProperty.SetIgnore(type);
 
@@ -123,7 +123,7 @@ namespace Haberdasher
 		}
 
 		public EntityType<TEntity> Alias(Expression<Func<TEntity, object>> property, string alias) {
-			var cachedProperty = GetPropertyFromExpression(property);
+			var cachedProperty = GetProperty(property);
 
 			cachedProperty.SetAlias(alias);
 
@@ -131,7 +131,7 @@ namespace Haberdasher
 		}
 
 		public EntityType<TEntity> Nullable(Expression<Func<TEntity, object>> property) {
-			var cachedProperty = GetPropertyFromExpression(property);
+			var cachedProperty = GetProperty(property);
 
 			cachedProperty.SetNullable();
 
