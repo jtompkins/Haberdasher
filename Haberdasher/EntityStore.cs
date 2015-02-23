@@ -531,5 +531,18 @@ namespace Haberdasher
 		}
 
 		#endregion
+
+		public static CachedType Register<T>(string alias = null) where T : class, new() {
+			var entityType = typeof(T);
+
+			if (CachedTypes.ContainsKey(entityType)) 
+				return CachedTypes[entityType];
+			
+			var type = new CachedType(entityType, true);
+
+			CachedTypes.Add(entityType, type);
+
+			return type;
+		}
 	}
 }

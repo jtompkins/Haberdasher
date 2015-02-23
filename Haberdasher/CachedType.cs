@@ -15,7 +15,7 @@ namespace Haberdasher
 		public IList<CachedProperty> InsertFields { get; private set; }
 		public IList<CachedProperty> UpdateFields { get; private set; }
 
-		public CachedType(Type type) {
+		public CachedType(Type type, bool ignoreMissingKey = false) {
 			Name = NameHelper.GetEntityTableName(type);
 
 			SelectFields = new List<CachedProperty>();
@@ -27,7 +27,8 @@ namespace Haberdasher
 
 			if (Key != null) return;
 
-			throw new MissingPrimaryKeyException("Entity type does not define a primary key.");
+			if (!ignoreMissingKey)
+				throw new MissingPrimaryKeyException("Entity type does not define a primary key.");
 		}
 
 		public void Add(CachedProperty property) {
