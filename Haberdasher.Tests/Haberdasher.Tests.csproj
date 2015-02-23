@@ -75,7 +75,7 @@
   <ItemGroup>
     <Compile Include="DbAccessFixture.cs" />
     <Compile Include="DelegateMethodTests.cs" />
-    <Compile Include="EntityStoreFixture.cs" />
+    <Compile Include="EntityStoreTests.cs" />
     <Compile Include="KeyTests.cs" />
     <Compile Include="NameTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
