@@ -28,6 +28,10 @@ namespace Haberdasher
 			return entityType;
 		}
 
+		public static bool IsRegistered<T>() where T : class, new() {
+			return Types.ContainsKey(typeof(T));
+		}
+
 		public static EntityType<T> Get<T>() where T : class, new() {
 			var type = typeof(T);
 

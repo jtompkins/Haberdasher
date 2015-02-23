@@ -43,7 +43,8 @@ namespace Haberdasher
 		#region Constructors
 
 		public EntityStore() {
-			EntityTypes.Register<TEntity>();
+			if (!EntityTypes.IsRegistered<TEntity>())
+				throw new Exception("You must register your type with EntityTypes before instantiating an EntityStore.");
 
 			_connectionString = ConnectionStringHelper.FindFirst();
 			_queryGenerator = new SqlServerGenerator();

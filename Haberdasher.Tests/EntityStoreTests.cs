@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Haberdasher.Support;
 using Xunit;
 
 namespace Haberdasher.Tests
@@ -18,6 +20,11 @@ namespace Haberdasher.Tests
 			public string Description { get; set; }
 		}
 
+		private class UnregisteredClass
+		{
+			public int Id { get; set; }
+		}
+
 		private readonly EntityType<TestClass> _simpleType;
 		private readonly EntityType<AliasedColumnsClass> _aliasedType;
 
@@ -33,6 +40,15 @@ namespace Haberdasher.Tests
 
 			_simpleEntityStore = new EntityStore<TestClass, int>();
 			_aliasedEntityStore = new EntityStore<AliasedColumnsClass, int>();
+		}
+
+		[Fact]
+		public void ThrowsOnUnregisteredType(){
+			var ex = Assert.Throws<Exception>(() => {
+				var s = new EntityStore<UnregisteredClass, int>();
+			});
+
+			Assert.Equal("You must register your type with EntityTypes before instantiating an EntityStore.", ex.Message);
 		}
 
 		[Fact]

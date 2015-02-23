@@ -80,7 +80,7 @@
     <Compile Include="NameTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyTests.cs" />
-    <Compile Include="SqlServerGeneratorFixture.cs" />
+    <Compile Include="SqlServerGeneratorTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Haberdasher\Haberdasher.csproj">
