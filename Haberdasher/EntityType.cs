@@ -10,7 +10,15 @@ namespace Haberdasher
 {
 	public class EntityType<TEntity> where TEntity : class, new()
 	{
-		public string Name { get; private set; }
+		public bool IsAliased { get; private set; }
+		public bool IsSingular { get; private set; }
+
+		public string Table { get; private set; }
+		public string TableAlias { get; private set; }
+
+		public string Name {
+			get { return IsAliased ? TableAlias : Table; }
+		}
 
 		public EntityProperty KeyField { get; private set; }
 
@@ -21,7 +29,7 @@ namespace Haberdasher
 		public EntityType() {
 			var type = typeof (TEntity);
 
-			Name = NameHelper.GetEntityTableName(type);
+			Table = NameHelper.GetEntityTableName<TEntity>();
 
 			SelectFields = new List<EntityProperty>();
 			InsertFields = new List<EntityProperty>();

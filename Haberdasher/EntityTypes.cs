@@ -11,10 +11,11 @@ namespace Haberdasher
 			Types = new Dictionary<Type, EntityType<object>>();
 		}
 
-		public static EntityType<T> Register<T>(Action<EntityType<T>> registerAction) where T : class, new() {
+		public static EntityType<T> Register<T>(Action<EntityType<T>> registerAction = null) where T : class, new() {
 			var entityType = new EntityType<T>();
 
-			registerAction(entityType);
+			if (registerAction != null)
+				registerAction(entityType);
 
 			var type = typeof(T);
 

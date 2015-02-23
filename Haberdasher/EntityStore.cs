@@ -21,7 +21,7 @@ namespace Haberdasher
 		private readonly bool _useProvidedConnection;
 
 		private string Table {
-			get { return EntityTypes.Get<TEntity>().Name; }
+			get { return EntityTypes.Get<TEntity>().Table; }
 		}
 
 		private EntityProperty Key {

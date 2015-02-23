@@ -1,33 +1,26 @@
-﻿using System;
-using System.Data.Entity.Design.PluralizationServices;
-using System.Globalization;
-using System.Reflection;
-using Haberdasher.Attributes;
-
-namespace Haberdasher.Support.Helpers
+﻿namespace Haberdasher.Support.Helpers
 {
 	public static class NameHelper
 	{
-		public static string GetEntityTableName<T>() {
-			return GetEntityTableName(typeof (T));
-		}
+		public static string GetEntityTableName<T>() where T : class, new() {
+			var entityType = EntityTypes.Get<T>();
 
-		public static string GetEntityTableName(Type type) {
+			if (entityType == null)
+				return null;
+
 			// there are three cases here:
 			//	1. The type name needs to be pluralized (the most common case)
-			//	2. The type name is aliased (look for the AliasAttribute on the type)
-			//	3. The type name should be used as-is (look for the SingularAttribute on the type)
+			//	2. The type name is aliased (look for the IsAlias property on the type)
+			//	3. The type name should be used as-is (look for the IsSingular property on the type)
 			// we'll check in reverse order.
 
-			if (type.GetCustomAttribute<SingularAttribute>() != null)
-				return type.Name;
+			if (entityType.IsSingular)
+				return entityType.Table;
 
-			var alias = type.GetCustomAttribute<AliasAttribute>();
+			if (entityType.IsAliased)
+				return entityType.TableAlias;
 
-			if (alias != null && !String.IsNullOrEmpty(alias.Alias))
-				return alias.Alias;
-
-			return PluralizationHelper.Pluralize(type.Name);
+			return PluralizationHelper.Pluralize(entityType.Table);
 		}
 	}
 }

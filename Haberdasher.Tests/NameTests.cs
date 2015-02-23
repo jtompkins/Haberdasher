@@ -42,21 +42,21 @@ namespace Haberdasher.Tests
 		public void PluralizesSingularNames() {
 			var type = new EntityType<Student>();
 
-			Assert.Equal("Students", type.Name);
+			Assert.Equal("Students", type.Table);
 		}
 
 		[Fact]
 		public void IgnoresAlreadyPluralizedNames() {
 			var type = new EntityType<Tests>();
 
-			Assert.Equal("Tests", type.Name);
+			Assert.Equal("Tests", type.Table);
 		}
 
 		[Fact]
 		public void PassesThroughAliasedClasses() {
 			var type = new EntityType<Teachers>();
 
-			Assert.Equal("Professors", type.Name);
+			Assert.Equal("Professors", type.Table);
 		}
 
 		[Fact]
@@ -69,7 +69,7 @@ namespace Haberdasher.Tests
 		}
 
 		public void FluentApiMarksPropertiesAsAliased() {
-			EntityTypeCache.Register<FluentAliasedColumnsClass>(t => {
+			EntityTypes.Register<FluentAliasedColumnsClass>(t => {
 				t.Alias(c => c.Name, "ADifferentName");
 			});
 		}

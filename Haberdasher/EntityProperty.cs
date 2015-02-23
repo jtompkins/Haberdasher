@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Haberdasher.Attributes;
 using Haberdasher.Support;
 using Haberdasher.Support.ExpressionBuilders;
 
@@ -56,37 +55,22 @@ namespace Haberdasher
 			_isValueType = property.PropertyType.IsValueType;
 			_isNullableType = property.PropertyType.IsNullableValueType();
 
-			var nullableAttr = property.GetCustomAttribute<NullableAttribute>();
-
-			if (nullableAttr != null || _isNullableType) {
+			if (_isNullableType)
 				SetNullable();
-			}
-			else {
+			else
 				DefaultValue = property.PropertyType.GetDefaultValue();
-			}
-
-			var aliasAttr = property.GetCustomAttribute<AliasAttribute>();
-
-			if (aliasAttr != null)
-				SetAlias(aliasAttr.Alias);
 
 			var autoDetectedKeyName = AutodetectableKeyNames.Any(n => n.Equals(property.Name, StringComparison.InvariantCultureIgnoreCase));
-			var keyAttribute = property.GetCustomAttribute<KeyAttribute>();
-			var ignoreAttribute = property.GetCustomAttribute<IgnoreAttribute>();
 
-			if (keyAttribute != null || autoDetectedKeyName) {
-				SetKey(keyAttribute != null ? keyAttribute.IsIdentity : (bool?)null);
-			}
-			else if (ignoreAttribute != null) {
-				SetIgnore(ignoreAttribute.Type);
-			}
+			if (autoDetectedKeyName)
+				SetKey();
 		}
 
 		#region Fluent Interface Support
 
-		public EntityProperty SetKey(bool? isIdentity) {
+		internal EntityProperty SetKey(bool? isIdentity = null) {
 			if (IsNullable)
-				throw new Exception("Key properties may not be marked with the Nullable attribute: " + Property);
+				throw new Exception("Key properties may not be marked as Nullable attribute: " + Property);
 
 			IsKey = true;
 			IsIdentity = isIdentity.HasValue ? isIdentity.GetValueOrDefault() && IsNumeric : IsNumeric;
@@ -98,7 +82,7 @@ namespace Haberdasher
 			return this;
 		}
 
-		public EntityProperty SetIgnore(IgnoreTypeEnum? type) {
+		internal EntityProperty SetIgnore(IgnoreTypeEnum? type = null) {
 			if (type.HasValue) {
 				IsSelectable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Select;
 				IsInsertable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Writes && type != IgnoreTypeEnum.Insert;
@@ -113,7 +97,7 @@ namespace Haberdasher
 			return this;
 		}
 
-		public EntityProperty SetAlias(string alias) {
+		internal EntityProperty SetAlias(string alias) {
 			if (String.IsNullOrEmpty(alias))
 				return this;
 
@@ -123,7 +107,7 @@ namespace Haberdasher
 			return this;
 		}
 
-		public EntityProperty SetNullable() {
+		internal EntityProperty SetNullable() {
 			if (_isValueType && !_isNullableType)
 				throw new Exception("Non-Nullable value type properties may not be marked Nullable: " + Property);
 
