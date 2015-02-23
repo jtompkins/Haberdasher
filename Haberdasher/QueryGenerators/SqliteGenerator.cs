@@ -14,7 +14,7 @@ namespace Haberdasher.QueryGenerators
 		private const string InsertFormat = "insert into [{0}] ({1}) values ({2})";
 		private const string InsertWithIdentityFormat = "insert into [{0}] ({1}) values ({2}); {3}";
 
-		private static string BuildColumns(IEnumerable<CachedProperty> properties) {
+		private static string BuildColumns(IEnumerable<EntityProperty> properties) {
 			if (!properties.Any()) return String.Empty;
 
 			var clauses = properties.Select(property => property.IsAliased
@@ -32,7 +32,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="whereClause">A WHERE clause which will be passed to the database</param>
-		public new string FindOne(string table, IEnumerable<CachedProperty> properties, string whereClause) {
+		public new string FindOne(string table, IEnumerable<EntityProperty> properties, string whereClause) {
 			return String.Format(FindOneFormat, BuildColumns(properties), table, whereClause);
 		}
 
@@ -42,7 +42,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
-		public new string Insert(string table, IDictionary<string, CachedProperty> properties, CachedProperty key) {
+		public new string Insert(string table, IDictionary<string, EntityProperty> properties, EntityProperty key) {
 			var fields = new List<string>();
 			var valueParams = new List<string>();
 

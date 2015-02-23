@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-
+using System.Runtime.InteropServices;
 using Dapper;
 
 using Haberdasher.Contracts;
@@ -14,10 +14,6 @@ namespace Haberdasher
 {
 	public class EntityStore<TEntity, TKey> : IEntityStore<TEntity, TKey> where TEntity : class, new()
 	{
-		protected static IDictionary<Type, CachedType> CachedTypes { get; set; }
-
-		private readonly Type _entityType;
-
 		private readonly IQueryGenerator _queryGenerator;
 
 		private readonly string _connectionString;
@@ -25,36 +21,29 @@ namespace Haberdasher
 		private readonly bool _useProvidedConnection;
 
 		private string Table {
-			get { return CachedTypes[_entityType].Name; }
+			get { return EntityTypes.Get<TEntity>().Name; }
 		}
 
-		private CachedProperty Key {
-			get { return CachedTypes[_entityType].Key; }
+		private EntityProperty Key {
+			get { return EntityTypes.Get<TEntity>().KeyField; }
 		}
 
-		private IEnumerable<CachedProperty> SelectFields {
-			get { return CachedTypes[_entityType].SelectFields; }
+		private IEnumerable<EntityProperty> SelectFields {
+			get { return EntityTypes.Get<TEntity>().SelectFields; }
 		}
 
-		private IEnumerable<CachedProperty> InsertFields {
-			get { return CachedTypes[_entityType].InsertFields; }
+		private IEnumerable<EntityProperty> InsertFields {
+			get { return EntityTypes.Get<TEntity>().InsertFields; }
 		}
 
-		private IEnumerable<CachedProperty> UpdateFields {
-			get { return CachedTypes[_entityType].UpdateFields; }
+		private IEnumerable<EntityProperty> UpdateFields {
+			get { return EntityTypes.Get<TEntity>().UpdateFields; }
 		}
 
 		#region Constructors
 
-		static EntityStore() {
-			CachedTypes = new Dictionary<Type, CachedType>();
-		}
-
 		public EntityStore() {
-			_entityType = typeof(TEntity);
-
-			if (!CachedTypes.ContainsKey(_entityType))
-				CachedTypes.Add(_entityType, new CachedType(_entityType));
+			EntityTypes.Register<TEntity>();
 
 			_connectionString = ConnectionStringHelper.FindFirst();
 			_queryGenerator = new SqlServerGenerator();
@@ -501,8 +490,8 @@ namespace Haberdasher
 			return new SqlConnection(_connectionString);
 		}
 
-		public Dictionary<string, CachedProperty> BuildPropertyList(IEnumerable<CachedProperty> properties) {
-			var propertyList = new Dictionary<string, CachedProperty>();
+		public Dictionary<string, EntityProperty> BuildPropertyList(IEnumerable<EntityProperty> properties) {
+			var propertyList = new Dictionary<string, EntityProperty>();
 
 			foreach (var property in properties) {
 				if (property == null || String.IsNullOrEmpty(property.Name))
@@ -517,7 +506,7 @@ namespace Haberdasher
 			return propertyList;
 		}
 
-		public DynamicParameters BuildParameterList(IEnumerable<CachedProperty> properties, TEntity entity) {
+		public DynamicParameters BuildParameterList(IEnumerable<EntityProperty> properties, TEntity entity) {
 			var parameterList = new DynamicParameters();
 
 			foreach (var property in properties) {
@@ -531,18 +520,5 @@ namespace Haberdasher
 		}
 
 		#endregion
-
-		public static CachedType Register<T>(string alias = null) where T : class, new() {
-			var entityType = typeof(T);
-
-			if (CachedTypes.ContainsKey(entityType)) 
-				return CachedTypes[entityType];
-			
-			var type = new CachedType(entityType, true);
-
-			CachedTypes.Add(entityType, type);
-
-			return type;
-		}
 	}
 }

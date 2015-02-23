@@ -44,22 +44,13 @@ namespace Haberdasher.Tests
 			public decimal Total { get; set; }
 		}
 
-		public class AliasedColumnsClass
-		{
-			public int Id { get; set; }
-
-			[Alias("ADifferentName")]
-			public string Name { get; set; }
-
-			[Alias(null)]
-			public string Description { get; set; }
-		}
+		
 
 		[Fact]
 		public void CachedPropertyDoesNotMarkNonKeyPropertiesAsKeys() {
 			var type = typeof(TestClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
 
 			Assert.Equal(false, nameProperty.IsKey);
 		}
@@ -68,7 +59,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyDoesNotMarkNonNumericPropertiesAsNumeric() {
 			var type = typeof(TestClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
 
 			Assert.Equal(false, nameProperty.IsNumeric);
 		}
@@ -77,7 +68,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksPropertiesAsNullable() {
 			var type = typeof(NullableAndIgnorableClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
 
 			Assert.Equal(true, nameProperty.IsNullable);
 		}
@@ -86,7 +77,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyThrowsExceptionForNullableKey() {
 			var type = typeof(NullableKeyClass);
 
-			var ex = Assert.Throws<Exception>(() => new CachedProperty(type.GetProperty("Id")));
+			var ex = Assert.Throws<Exception>(() => new EntityProperty(type.GetProperty("Id")));
 
 			Assert.Equal("Key properties may not be marked with the Nullable attribute: Id", ex.Message);
 		}
@@ -95,7 +86,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyThrowsExceptionForNullableOnNonNullableProperty() {
 			var type = typeof(NullableKeyClass);
 
-			var ex = Assert.Throws<Exception>(() => new CachedProperty(type.GetProperty("Total")));
+			var ex = Assert.Throws<Exception>(() => new EntityProperty(type.GetProperty("Total")));
 
 			Assert.Equal("Non-Nullable value type properties may not be marked with the Nullable attribute: Total", ex.Message);
 		}
@@ -104,7 +95,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksPropertiesAsSelectable() {
 			var type = typeof(TestClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
 
 			Assert.Equal(true, nameProperty.IsSelectable);
 		}
@@ -113,7 +104,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksPropertiesAsInsertable() {
 			var type = typeof(TestClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
 
 			Assert.Equal(true, nameProperty.IsInsertable);
 		}
@@ -122,7 +113,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksPropertiesAsUpdatable() {
 			var type = typeof(TestClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
 
 			Assert.Equal(true, nameProperty.IsUpdatable);
 		}
@@ -131,7 +122,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyCalculatesDefaultValue() {
 			var type = typeof(TestClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
 
 			Assert.Equal(string.Empty, nameProperty.DefaultValue);
 		}
@@ -140,8 +131,8 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksPropertiesAsNotSelectable() {
 			var type = typeof(NullableAndIgnorableClass);
 
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
-			var zipProperty = new CachedProperty(type.GetProperty("Zip"));
+			var nameProperty = new EntityProperty(type.GetProperty("Name"));
+			var zipProperty = new EntityProperty(type.GetProperty("Zip"));
 
 			Assert.Equal(false, nameProperty.IsSelectable);
 			Assert.Equal(false, zipProperty.IsSelectable);
@@ -151,9 +142,9 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksPropertiesAsNotInsertable() {
 			var type = typeof(NullableAndIgnorableClass);
 
-			var addressProperty = new CachedProperty(type.GetProperty("Address"));
-			var stateProperty = new CachedProperty(type.GetProperty("State"));
-			var zipProperty = new CachedProperty(type.GetProperty("Zip"));
+			var addressProperty = new EntityProperty(type.GetProperty("Address"));
+			var stateProperty = new EntityProperty(type.GetProperty("State"));
+			var zipProperty = new EntityProperty(type.GetProperty("Zip"));
 
 			Assert.Equal(false, addressProperty.IsInsertable);
 			Assert.Equal(false, stateProperty.IsInsertable);
@@ -164,41 +155,15 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksPropertiesAsNotUpdatable() {
 			var type = typeof(NullableAndIgnorableClass);
 
-			var cityProperty = new CachedProperty(type.GetProperty("City"));
-			var stateProperty = new CachedProperty(type.GetProperty("State"));
-			var zipProperty = new CachedProperty(type.GetProperty("Zip"));
+			var cityProperty = new EntityProperty(type.GetProperty("City"));
+			var stateProperty = new EntityProperty(type.GetProperty("State"));
+			var zipProperty = new EntityProperty(type.GetProperty("Zip"));
 
 			Assert.Equal(false, cityProperty.IsUpdatable);
 			Assert.Equal(false, stateProperty.IsUpdatable);
 			Assert.Equal(false, zipProperty.IsUpdatable);
 		}
 
-		[Fact]
-		public void CachedPropertyMarksPropertiesAsAliased() {
-			var type = typeof(AliasedColumnsClass);
-
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
-
-			Assert.Equal(true, nameProperty.IsAliased);
-		}
-
-		[Fact]
-		public void CachedPropertyAliasesPropertiesToProperValue() {
-			var type = typeof(AliasedColumnsClass);
-
-			var nameProperty = new CachedProperty(type.GetProperty("Name"));
-
-			Assert.Equal("ADifferentName", nameProperty.Alias);
-		}
-
-		[Fact]
-		public void CachedPropertyDoesNotAliasPropertiesThatAreAliasedToNull() {
-			var type = typeof(AliasedColumnsClass);
-
-			var descProperty = new CachedProperty(type.GetProperty("Description"));
-
-
-			Assert.Equal(false, descProperty.IsAliased);
-		}
+		
 	}
 }

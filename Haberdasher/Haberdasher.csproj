@@ -52,8 +52,8 @@
     <Compile Include="Attributes\KeyAttribute.cs" />
     <Compile Include="Attributes\NullableAttribute.cs" />
     <Compile Include="Attributes\SingularAttribute.cs" />
-    <Compile Include="CachedProperty.cs" />
-    <Compile Include="CachedType.cs" />
+    <Compile Include="EntityProperty.cs" />
+    <Compile Include="EntityType.cs" />
     <Compile Include="Contracts\IEntityStore.cs" />
     <Compile Include="Contracts\IQueryGenerator.cs" />
     <Compile Include="EntityStore.cs" />

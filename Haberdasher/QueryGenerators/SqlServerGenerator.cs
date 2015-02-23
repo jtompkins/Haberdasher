@@ -28,7 +28,7 @@ namespace Haberdasher.QueryGenerators
 
         public const string ParameterFormat = "@";
 
-		private static string BuildColumns(IEnumerable<CachedProperty> properties) {
+		private static string BuildColumns(IEnumerable<EntityProperty> properties) {
 			if (!properties.Any()) return String.Empty;
 
 			var clauses = properties.Select(property => property.IsAliased
@@ -46,7 +46,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="key">The property that represents the table's primary key</param>
-		public string SelectAll(string table, IEnumerable<CachedProperty> properties, CachedProperty key) {
+		public string SelectAll(string table, IEnumerable<EntityProperty> properties, EntityProperty key) {
 			return String.Format(SelectAllFormat, BuildColumns(properties), table, key.Name);
 		}
 
@@ -57,7 +57,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="key">The property that represents the table's primary key</param>
 		/// <param name="value">The value which will be passed to the database</param>
-		public string Select(string table, IEnumerable<CachedProperty> properties, CachedProperty key, string value) {
+		public string Select(string table, IEnumerable<EntityProperty> properties, EntityProperty key, string value) {
 			return String.Format(SelectFormat, BuildColumns(properties), table, key.Name, value);
 		}
 
@@ -68,7 +68,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="key">The property that represents the table's primary key</param>
 		/// <param name="values">The primary key values that will be passed to the database</param>
-		public string SelectMany(string table, IEnumerable<CachedProperty> properties, CachedProperty key, string values) {
+		public string SelectMany(string table, IEnumerable<EntityProperty> properties, EntityProperty key, string values) {
 			return String.Format(SelectManyFormat, BuildColumns(properties), table, key.Name, values);
 		}
 
@@ -78,7 +78,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="whereClause">A WHERE clause which will be passed to the database</param>
-		public string Find(string table, IEnumerable<CachedProperty> properties, string whereClause) {
+		public string Find(string table, IEnumerable<EntityProperty> properties, string whereClause) {
 			return String.Format(FindFormat, BuildColumns(properties), table, whereClause);
 		}
 
@@ -88,7 +88,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="properties">An enumerable of properties to be included in the SELECT clause</param>
 		/// <param name="whereClause">A WHERE clause which will be passed to the database</param>
-		public string FindOne(string table, IEnumerable<CachedProperty> properties, string whereClause) {
+		public string FindOne(string table, IEnumerable<EntityProperty> properties, string whereClause) {
 			return String.Format(FindOneFormat, BuildColumns(properties), table, whereClause);
 		}
 
@@ -98,7 +98,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
-		public string Insert(string table, IDictionary<string, CachedProperty> properties, CachedProperty key) {
+		public string Insert(string table, IDictionary<string, EntityProperty> properties, EntityProperty key) {
 			var fields = new List<string>();
 			var valueParams = new List<string>();
 
@@ -120,7 +120,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="value">The key to be updated</param>
-		public string Update(string table, IDictionary<string, CachedProperty> properties, CachedProperty key, string value) {
+		public string Update(string table, IDictionary<string, EntityProperty> properties, EntityProperty key, string value) {
 			var clauses = properties.Select(kvp => String.Format(UpdateParamFormat, kvp.Value.Name, kvp.Key));
 
 			return String.Format(UpdateFormat, table, String.Join(", ", clauses), key.Name, value);
@@ -133,7 +133,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="properties">A dictionary representing the properties to be inserted; the key is the parameterized name of the property and the value is the property itself</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="values">The keys to be updated</param>
-		public string UpdateMany(string table, IDictionary<string, CachedProperty> properties, CachedProperty key, string values) {
+		public string UpdateMany(string table, IDictionary<string, EntityProperty> properties, EntityProperty key, string values) {
 			var clauses = properties.Select(kvp => String.Format(UpdateParamFormat, kvp.Value.Name, kvp.Key));
 
 			return String.Format(UpdateManyFormat, table, String.Join(", ", clauses), key.Name, values);
@@ -153,7 +153,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="value">The key to be deleted</param>
-		public string Delete(string table, CachedProperty key, string value) {
+		public string Delete(string table, EntityProperty key, string value) {
 			return String.Format(DeleteFormat, table, key.Name, value);
 		}
 
@@ -163,7 +163,7 @@ namespace Haberdasher.QueryGenerators
 		/// <param name="table">The name of the table</param>
 		/// <param name="key">The primary key of the table</param>
 		/// <param name="values">The keys to be deleted</param>
-		public string DeleteMany(string table, CachedProperty key, string values) {
+		public string DeleteMany(string table, EntityProperty key, string values) {
 			return String.Format(DeleteManyFormat, table, key.Name, values);
 		}
 

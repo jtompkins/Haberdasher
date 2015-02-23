@@ -23,15 +23,15 @@ namespace Haberdasher.Tests
 			public string Description { get; set; }
 		}
 
-		private readonly CachedType _simpleType;
-		private readonly CachedType _aliasedType;
+		private readonly EntityType<TestClass> _simpleType;
+		private readonly EntityType<AliasedColumnsClass> _aliasedType;
 
 		private readonly EntityStore<TestClass, int> _simpleEntityStore;
 		private readonly EntityStore<AliasedColumnsClass, int> _aliasedEntityStore;
 
 		public EntityStoreFixture() {
-			_simpleType = new CachedType(typeof(TestClass));
-			_aliasedType = new CachedType(typeof(AliasedColumnsClass));
+			_simpleType = new EntityType<TestClass>();
+			_aliasedType = new EntityType<AliasedColumnsClass>();
 
 			_simpleEntityStore = new EntityStore<TestClass, int>();
 			_aliasedEntityStore = new EntityStore<AliasedColumnsClass, int>();

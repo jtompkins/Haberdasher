@@ -11,12 +11,12 @@ namespace Haberdasher.Tests
 
 		public class GetterTests
 		{
-			private readonly CachedProperty _idProperty;
+			private readonly EntityProperty _idProperty;
 
 			public GetterTests() {
 				var simpleClassType = typeof(TestClass);
 
-				_idProperty = new CachedProperty(simpleClassType.GetProperty("Id"));
+				_idProperty = new EntityProperty(simpleClassType.GetProperty("Id"));
 			}
 
 			[Fact]
@@ -29,12 +29,12 @@ namespace Haberdasher.Tests
 
 		public class SetterTests
 		{
-			private readonly CachedProperty _idProperty;
+			private readonly EntityProperty _idProperty;
 
 			public SetterTests() {
 				var simpleClassType = typeof(TestClass);
 
-				_idProperty = new CachedProperty(simpleClassType.GetProperty("Id"));
+				_idProperty = new EntityProperty(simpleClassType.GetProperty("Id"));
 			}
 
 			[Fact]
@@ -49,12 +49,12 @@ namespace Haberdasher.Tests
 
 		public class ComparerTests
 		{
-			private readonly CachedProperty _idProperty;
+			private readonly EntityProperty _idProperty;
 
 			public ComparerTests() {
 				var simpleClassType = typeof(TestClass);
 
-				_idProperty = new CachedProperty(simpleClassType.GetProperty("Id"));
+				_idProperty = new EntityProperty(simpleClassType.GetProperty("Id"));
 			}
 
 			[Fact]

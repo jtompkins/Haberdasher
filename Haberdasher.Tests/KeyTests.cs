@@ -32,7 +32,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyFindsMarkedKey() {
 			var type = typeof(MarkedKeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(true, idProperty.IsKey);
 		}
@@ -41,7 +41,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyFindsUnmarkedKey() {
 			var type = typeof(KeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(true, idProperty.IsKey);
 		}
@@ -50,7 +50,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksUnmarkedKeyAsIdentity() {
 			var type = typeof(KeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(true, idProperty.IsKey);
 			Assert.Equal(true, idProperty.IsIdentity);
@@ -60,7 +60,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksNumericKeys() {
 			var type = typeof(MarkedKeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(true, idProperty.IsNumeric);
 		}
@@ -69,7 +69,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksIdentityKeys() {
 			var type = typeof(MarkedKeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(true, idProperty.IsIdentity);
 		}
@@ -78,7 +78,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksNonIdentityKeys() {
 			var type = typeof(NonIdentityKeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(false, idProperty.IsIdentity);
 		}
@@ -87,7 +87,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksIdAsSelectable() {
 			var type = typeof(MarkedKeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(true, idProperty.IsSelectable);
 		}
@@ -96,7 +96,7 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksIdAsNotInsertable() {
 			var type = typeof(MarkedKeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(false, idProperty.IsInsertable);
 		}
@@ -105,14 +105,14 @@ namespace Haberdasher.Tests
 		public void CachedPropertyMarksIdAsNotUpdatable() {
 			var type = typeof(MarkedKeyClass);
 
-			var idProperty = new CachedProperty(type.GetProperty("Id"));
+			var idProperty = new EntityProperty(type.GetProperty("Id"));
 
 			Assert.Equal(false, idProperty.IsUpdatable);
 		}
 
 		[Fact]
 		public void CachedTypeThrowsForMissingKey() {
-			Assert.Throws<MissingPrimaryKeyException>(() => new CachedType(typeof(MissingKeyClass)));
+			Assert.Throws<MissingPrimaryKeyException>(() => new EntityType<MissingKeyClass>());
 		}
 	}
 }
