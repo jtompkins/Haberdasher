@@ -83,6 +83,9 @@ namespace Haberdasher
 		}
 
 		internal EntityProperty SetIgnore(IgnoreTypeEnum? type = null) {
+			if (IsKey)
+				throw new Exception("Cannot override ignore properties of primary key: " + Property);
+
 			if (type.HasValue) {
 				IsSelectable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Select;
 				IsInsertable = type != IgnoreTypeEnum.All && type != IgnoreTypeEnum.Writes && type != IgnoreTypeEnum.Insert;
@@ -108,6 +111,9 @@ namespace Haberdasher
 		}
 
 		internal EntityProperty SetNullable() {
+			if (IsKey)
+				throw new Exception("Cannot set primary key to be nullable: " + Property);
+
 			if (_isValueType && !_isNullableType)
 				throw new Exception("Non-Nullable value type properties may not be marked Nullable: " + Property);
 

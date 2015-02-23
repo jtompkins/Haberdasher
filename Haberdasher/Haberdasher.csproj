@@ -13,6 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <NuGetPackageImportStamp>e4b924c9</NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -62,7 +63,6 @@
     <Compile Include="Support\ExpressionBuilders\GetterBuilder.cs" />
     <Compile Include="Support\ExpressionBuilders\SetterBuilder.cs" />
     <Compile Include="QueryGenerators\SqlServerGenerator.cs" />
-    <Compile Include="Support\Helpers\NameHelper.cs" />
     <Compile Include="Support\Helpers\PluralizationHelper.cs" />
   </ItemGroup>
   <ItemGroup>

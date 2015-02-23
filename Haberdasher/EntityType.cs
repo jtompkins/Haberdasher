@@ -10,15 +10,7 @@ namespace Haberdasher
 {
 	public class EntityType<TEntity> where TEntity : class, new()
 	{
-		public bool IsAliased { get; private set; }
-		public bool IsSingular { get; private set; }
-
-		public string Table { get; private set; }
-		public string TableAlias { get; private set; }
-
-		public string Name {
-			get { return IsAliased ? TableAlias : Table; }
-		}
+		public string Name { get; private set; }
 
 		public EntityProperty KeyField { get; private set; }
 
@@ -29,7 +21,7 @@ namespace Haberdasher
 		public EntityType() {
 			var type = typeof (TEntity);
 
-			Table = NameHelper.GetEntityTableName<TEntity>();
+			Name = PluralizationHelper.Pluralize(type.Name);
 
 			SelectFields = new List<EntityProperty>();
 			InsertFields = new List<EntityProperty>();
@@ -73,7 +65,7 @@ namespace Haberdasher
 				propertyInfo = (property.Body as MemberExpression).Member as PropertyInfo;
 			}
 			else {
-				var body = (UnaryExpression) property.Body;
+				var body = (UnaryExpression)property.Body;
 				var member = body.Operand as MemberExpression;
 
 				if (member == null)
@@ -94,6 +86,25 @@ namespace Haberdasher
 
 			return cachedProperty;
 		}
+
+		#endregion
+
+		#region Fluent Interface Methods
+
+		public EntityType<TEntity> Singular() {
+			var type = typeof(TEntity);
+
+			Name = type.Name;
+
+			return this;
+		}
+
+		public EntityType<TEntity> AliasTable(string alias){
+			if (!String.IsNullOrEmpty(alias))
+				Name = alias;
+
+			return this;
+		} 
 
 		public EntityType<TEntity> Key(Expression<Func<TEntity, object>> property, bool? isIdentity) {
 			var cachedProperty = GetPropertyFromExpression(property);
