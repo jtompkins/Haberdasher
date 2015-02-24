@@ -73,7 +73,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbAccessFixture.cs" />
+    <Compile Include="SqliteDbAccessTests.cs" />
     <Compile Include="DelegateMethodTests.cs" />
     <Compile Include="EntityStoreTests.cs" />
     <Compile Include="KeyTests.cs" />

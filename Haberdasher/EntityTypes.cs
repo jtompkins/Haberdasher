@@ -6,10 +6,10 @@ namespace Haberdasher
 {
 	public class EntityTypes
 	{
-		private static IDictionary<Type, EntityType<object>> Types { get; set; }
+		private static IDictionary<Type, object> Types { get; set; }
 
 		static EntityTypes() {
-			Types = new Dictionary<Type, EntityType<object>>();
+			Types = new Dictionary<Type, object>();
 		}
 
 		public static EntityType<T> Register<T>(Action<EntityType<T>> registerAction = null) where T : class, new() {
@@ -23,7 +23,7 @@ namespace Haberdasher
 
 			var type = typeof(T);
 
-			Types[type] = entityType as EntityType<object>;
+			Types[type] = entityType;
 
 			return entityType;
 		}
