@@ -74,6 +74,9 @@ namespace Haberdasher
 				propertyInfo = member.Member as PropertyInfo;
 			}
 
+			if (propertyInfo == null)
+				throw new InvalidOperationException("Couldn't find property in type.");
+
 			return propertyInfo.Name;
 		}
 
@@ -82,7 +85,7 @@ namespace Haberdasher
 			var cachedProperty = GetMemberByName(name);
 
 			if (cachedProperty == null)
-				throw new InvalidOperationException("Couldn't find member in property cache.");
+				throw new InvalidOperationException("Couldn't find property in property cache.");
 
 			return cachedProperty;
 		}

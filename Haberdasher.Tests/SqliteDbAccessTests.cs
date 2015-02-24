@@ -23,18 +23,18 @@ namespace Haberdasher.Tests
 			public string Name { get; set; }
 		}
 
-		private EntityStore<Manufacturer, int> _manufacturerStore;
-		private EntityStore<Product, int> _productStore;
+		private readonly EntityStore<Manufacturer, int> _manufacturerStore;
+		private readonly EntityStore<Product, int> _productStore;
 
-		private string GetDbFile() {
+		private static string GetDbFile() {
 			return Environment.CurrentDirectory + "\\TestDb.sqlite";
 		}
 
-		private SQLiteConnection GetDbConnection() {
+		private static SQLiteConnection GetDbConnection() {
 			return new SQLiteConnection("Data Source=" + GetDbFile());
 		}
 
-		private void CreateDatabase() {
+		private static void CreateDatabase() {
 			using (var cnn = GetDbConnection()) {
 				cnn.Open();
 
@@ -74,7 +74,7 @@ namespace Haberdasher.Tests
 
 		[Fact]
 		public void InsertsRecords() {
-			var newManufacturer = new Manufacturer() {
+			var newManufacturer = new Manufacturer {
 				Name = "Test Manufacturer"
 			};
 
@@ -86,7 +86,7 @@ namespace Haberdasher.Tests
 
 			Assert.Equal(1, allManufacturers.Count());
 
-			var newProduct = new Product() {
+			var newProduct = new Product {
 				ManufacturerId = manufacturerId,
 				Name = "Test Product"
 			};
@@ -98,7 +98,7 @@ namespace Haberdasher.Tests
 
 		[Fact]
 		public void SelectsRecords() {
-			var newManufacturer = new Manufacturer() {
+			var newManufacturer = new Manufacturer {
 				Name = "Test Manufacturer"
 			};
 
@@ -110,7 +110,7 @@ namespace Haberdasher.Tests
 			Assert.Equal(manufacturerId, m.Id);
 			Assert.Equal("Test Manufacturer", m.Name);
 
-			var newProduct = new Product() {
+			var newProduct = new Product {
 				ManufacturerId = manufacturerId,
 				Name = "Test Product"
 			};
@@ -126,7 +126,7 @@ namespace Haberdasher.Tests
 
 		[Fact]
 		public void UpdatesRecords() {
-			var newManufacturer = new Manufacturer() {
+			var newManufacturer = new Manufacturer {
 				Name = "Test Manufacturer"
 			};
 
@@ -145,7 +145,7 @@ namespace Haberdasher.Tests
 
 		[Fact]
 		public void DeletesRecords() {
-			var newManufacturer = new Manufacturer() {
+			var newManufacturer = new Manufacturer {
 				Name = "Test Manufacturer"
 			};
 
