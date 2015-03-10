@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Haberdasher")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A lightweight CRUD wrapper for the Dapper Micro-ORM.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Arclight Software, LLC")]
 [assembly: AssemblyProduct("Haberdasher")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

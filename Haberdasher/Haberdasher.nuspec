@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>0.4</version>
+    <title>Haberdasher</title>
+    <authors>Joshua Tompkins</authors>
+    <licenseUrl>https://github.com/jtompkins/Haberdasher/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/jtompkins/Haberdasher</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A lightweight CRUD wrapper for the Dapper Micro-ORM.</description>
+    <releaseNotes>Added the new "fluent interface" for defining entity types. Removed the old annotation-based interface. Haberdasher entities are now true POCO classes.</releaseNotes>
+    <tags>orm sql micro-orm</tags>
+
+    <dependencies>
+        <group>
+          <dependency id="Dapper" version="1.38" />
+        </group>
+    </dependencies>
+  </metadata>
+</package>
