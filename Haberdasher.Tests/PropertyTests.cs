@@ -102,32 +102,49 @@ namespace Haberdasher.Tests
 		[Fact]
 		public void MarksPropertiesAsNotSelectable() {
 			var totalProperty = _testClassType.GetProperty<TestClass>(t => t.Total);
-			var zipProperty = _testClassType.GetProperty<TestClass>(t => t.Zip);
 
 			Assert.Equal(false, totalProperty.IsSelectable);
-			Assert.Equal(false, zipProperty.IsSelectable);
 		}
 
 		[Fact]
 		public void MarksPropertiesAsNotInsertable() {
 			var addressProperty = _testClassType.GetProperty<TestClass>(t => t.Address);
 			var stateProperty = _testClassType.GetProperty<TestClass>(t => t.State);
-			var zipProperty = _testClassType.GetProperty<TestClass>(t => t.Zip);
 
 			Assert.Equal(false, addressProperty.IsInsertable);
 			Assert.Equal(false, stateProperty.IsInsertable);
-			Assert.Equal(false, zipProperty.IsInsertable);
 		}
 
 		[Fact]
 		public void MarksPropertiesAsNotUpdatable() {
 			var cityProperty = _testClassType.GetProperty<TestClass>(t => t.City);
 			var stateProperty = _testClassType.GetProperty<TestClass>(t => t.State);
-			var zipProperty = _testClassType.GetProperty<TestClass>(t => t.Zip);
 
 			Assert.Equal(false, cityProperty.IsUpdatable);
 			Assert.Equal(false, stateProperty.IsUpdatable);
-			Assert.Equal(false, zipProperty.IsUpdatable);
+		}
+
+		[Fact]
+		public void RemovesIgnoredPropertiesFromCache() {
+			var totalProperty = _testClassType.GetProperty<TestClass>(t => t.Total);
+			var cityProperty = _testClassType.GetProperty<TestClass>(t => t.City);
+			var stateProperty = _testClassType.GetProperty<TestClass>(t => t.State);
+
+			// ignore: select
+			Assert.False(_testClassType.SelectFields.Contains(totalProperty));
+
+			// ignore: update
+			Assert.False(_testClassType.UpdateFields.Contains(cityProperty));
+
+			// ignore: writes
+			Assert.False(_testClassType.InsertFields.Contains(stateProperty));
+			Assert.False(_testClassType.UpdateFields.Contains(stateProperty));
+		}
+
+		[Fact]
+		public void ForgetsPropertiesThatAreIgnoreAll()
+		{
+			Assert.Throws<InvalidOperationException>(() => _testClassType.GetProperty<TestClass>(t => t.Zip));
 		}
 	}
 }

@@ -90,6 +90,58 @@ namespace Haberdasher
 			return cachedProperty;
 		}
 
+		private void RemoveFromSelect(EntityProperty property) {
+			if (SelectFields.Contains(property))
+				SelectFields.Remove(property);
+		}
+
+		private void RemoveFromInsert(EntityProperty property) {
+			if (InsertFields.Contains(property))
+				InsertFields.Remove(property);
+		}
+
+		private void RemoveFromUpdate(EntityProperty property) {
+			if (UpdateFields.Contains(property))
+				UpdateFields.Remove(property);
+		}
+
+		private void RemoveFromFieldCache(EntityProperty property, IgnoreTypeEnum? type)
+		{
+			if (!type.HasValue)
+				return;
+
+			switch (type)
+			{
+				case IgnoreTypeEnum.Select:
+					RemoveFromSelect(property);
+
+					break;
+
+				case IgnoreTypeEnum.Insert:
+					RemoveFromInsert(property);
+
+					break;
+
+				case IgnoreTypeEnum.Update:
+					RemoveFromUpdate(property);
+
+					break;
+
+				case IgnoreTypeEnum.Writes:
+					RemoveFromInsert(property);
+					RemoveFromUpdate(property);
+
+					break;
+
+				case IgnoreTypeEnum.All:
+					RemoveFromSelect(property);
+					RemoveFromInsert(property);
+					RemoveFromUpdate(property);
+
+					break;
+			}
+		}
+
 		#endregion
 
 		#region Fluent Interface Methods
@@ -121,6 +173,7 @@ namespace Haberdasher
 			var cachedProperty = GetProperty(property);
 
 			cachedProperty.SetIgnore(type);
+			RemoveFromFieldCache(cachedProperty, type);
 
 			return this;
 		}
