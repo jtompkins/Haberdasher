@@ -16,7 +16,7 @@ Even though Haberdasher isn't an ORM in the traditional sense, some of the same 
 
 Haberdasher needs to know how your entities are structured in order to automate reading and writing them to the database. You provide that information registering your types with the `EntityTypes` class, which provides a cache of type information for use by the `EntityStore`.
 
-For simple types, just call `Register<T>` and Haberdasher wil take care of the rest:
+For simple types, just call `Register<T>` and Haberdasher will take care of the rest:
 
     EntityTypes.Register<Product>();
 
@@ -101,7 +101,7 @@ When generating SQL for database reads and writes, Haberdasher will include all 
 * `Insert`
 * `Update`
 
-Key columns always `SELECT`-able. Identity keys are always ignored for `INSERT`s and `UPDATE`s.
+Key columns are always `SELECT`-able. Identity keys are always ignored for `INSERT`s and `UPDATE`s.
 
     public class Customer {
         public int Id { get; set; }
